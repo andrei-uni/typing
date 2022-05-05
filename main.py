@@ -20,23 +20,50 @@ def get_text():
         return f.read()
 
 
+def calculate_correctness_percentage():
+    global mistook_times, cur_index
+    if cur_index == 0:
+        return 0
+    return (cur_index - mistook_times) / cur_index * 100
+
+
 def key_pressed(event):
-    global text_content, cur_index, main_text
+    global text_content, cur_index, main_text, mistook_times, correctness_percentage, mistook_letter, percentage_label
     if event.char == "":
         return
     main_text.config(state=NORMAL)
     if event.char == text_content[cur_index]:
+        mistook_letter = False
         cur_index += 1
         main_text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
         main_text.tag_add("previous", f"1.0", f"1.{cur_index}")
     else:
+        if not mistook_letter:
+            mistook_times += 1
+            mistook_letter = True
         main_text.tag_add("wrong", f"1.{cur_index}", f"1.{cur_index+1}")
 
     main_text.config(state=DISABLED)
 
+    correctness_percentage = int(calculate_correctness_percentage())
+    percentage_label.config(text=f"Точность:\n {correctness_percentage}%")
+
 
 cur_index = 0
 text_content = get_text()
+text_len = len(text_content)
+
+mistook_times = 0
+correctness_percentage = 100
+mistook_letter = False
+
+
+percentage_label = Label(
+    text=f"Точность:\n {correctness_percentage}%",
+    width=10,
+    height=10,
+)
+percentage_label.pack(side=LEFT)
 
 main_text = Text(
     root,
