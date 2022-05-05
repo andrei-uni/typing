@@ -1,8 +1,7 @@
-import tkinter as tk
-from tkinter import ttk
+from tkinter import *
 
 
-root = tk.Tk()
+root = Tk()
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 window_width = screen_width / 2
@@ -20,22 +19,26 @@ def get_text():
 
 
 def key_pressed(event):
-    global text, cur_index, label
-    if event.char == text[cur_index]:
+    global text_content, cur_index, text
+    if event.char == text_content[cur_index]:
         cur_index += 1
-        label.config(text=text[cur_index:])
+        text.config(state=NORMAL)
+        text.delete("1.0", "end")
+        text.insert(INSERT, text_content[cur_index:])
+        text.config(state=DISABLED)
 
 
 cur_index = 0
-text = get_text()
+text_content = get_text()
 
 
-label = ttk.Label(
+text = Text(
     root,
-    text=text[cur_index:],
     font=("Helvetica", 14)
 )
-label.pack(ipadx=10, ipady=10)
+text.insert(INSERT, text_content[cur_index:])
+text.config(state=DISABLED)
+text.pack(ipadx=10, ipady=10)
 
 root.bind("<Key>", key_pressed)
 
