@@ -1,7 +1,7 @@
 from tkinter import *
 from ctypes import windll
 import random
-
+import datetime
 
 windll.shcore.SetProcessDpiAwareness(1)
 
@@ -16,7 +16,7 @@ button.pack(side=BOTTOM)
 
 def get_text():
     number = random.randrange(1, 5, 1)
-    with open(str(number)+".txt", 'r', encoding="utf-8") as f:
+    with open(str(number) + ".txt", 'r', encoding="utf-8") as f:
         return f.read()
 
 
@@ -28,20 +28,25 @@ def calculate_correctness_percentage():
 
 
 def key_pressed(event):
-    global text_content, cur_index, main_text, mistook_times, correctness_percentage, mistook_letter, percentage_label
+    global text_len, text_content, cur_index, main_text, mistook_times, correctness_percentage, mistook_letter, percentage_label, char_per_minutes, start_time
+    if cur_index == 0:
+        start_time = datetime.datetime.now()
     if event.char == "":
         return
     main_text.config(state=NORMAL)
     if event.char == text_content[cur_index]:
         mistook_letter = False
         cur_index += 1
-        main_text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
+        main_text.tag_add("current", f"1.{cur_index}", f"1.{cur_index + 1}")
         main_text.tag_add("previous", f"1.0", f"1.{cur_index}")
+        if cur_index == text_len:
+            char_per_minutes = (cur_index / (datetime.datetime.now().minute - start_time.minute))
+            speed_rate_label.config(text=f"Скорость:\n{char_per_minutes}зн./МИН")
     else:
         if not mistook_letter:
             mistook_times += 1
             mistook_letter = True
-        main_text.tag_add("wrong", f"1.{cur_index}", f"1.{cur_index+1}")
+        main_text.tag_add("wrong", f"1.{cur_index}", f"1.{cur_index + 1}")
 
     main_text.config(state=DISABLED)
 
@@ -57,7 +62,6 @@ mistook_times = 0
 correctness_percentage = 100
 mistook_letter = False
 
-
 percentage_label = Label(
     text=f"Точность:\n {correctness_percentage}%",
     width=10,
@@ -69,12 +73,22 @@ main_text = Text(
     root,
     font=("Consolas", 14)
 )
+
+time_minute = 0
+char_per_minutes = 0
+
+speed_rate_label = Label(text=f"Скорость:\n{char_per_minutes}ЗН./МИН",
+                         width=20,
+                         height=10)
+
+speed_rate_label.pack(side=RIGHT)
+
 main_text.insert(INSERT, text_content)
 main_text.tag_config("current", background="green", foreground="white")
 main_text.tag_config("previous", background="white", foreground="green")
 main_text.tag_config("wrong", foreground="red")
 
-main_text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
+main_text.tag_add("current", f"1.{cur_index}", f"1.{cur_index + 1}")
 main_text.config(state=DISABLED)
 main_text.pack(ipadx=10, ipady=10)
 
