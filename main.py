@@ -16,12 +16,17 @@ def get_text():
 
 def key_pressed(event):
     global text_content, cur_index, text
+    if event.char == "":
+        return
+    text.config(state=NORMAL)
     if event.char == text_content[cur_index]:
         cur_index += 1
-        text.config(state=NORMAL)
         text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
         text.tag_add("previous", f"1.0", f"1.{cur_index}")
-        text.config(state=DISABLED)
+    else:
+        text.tag_add("wrong", f"1.{cur_index}", f"1.{cur_index+1}")
+
+    text.config(state=DISABLED)
 
 
 cur_index = 0
@@ -35,6 +40,8 @@ text = Text(
 text.insert(INSERT, text_content)
 text.tag_config("current", background="green", foreground="white")
 text.tag_config("previous", background="white", foreground="green")
+text.tag_config("wrong", background="#ff5a60", foreground="white")
+
 text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
 text.config(state=DISABLED)
 text.pack(ipadx=10, ipady=10)
