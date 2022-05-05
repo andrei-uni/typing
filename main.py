@@ -3,6 +3,7 @@ from tkinter import *
 
 root = Tk()
 root.attributes('-fullscreen', True)
+root["bg"] = "#54c6ff"
 root.title('Tkinter Window Demo')
 
 button = Button(text="Выключить", width=15, height=5, bg="grey", fg="white", command=root.destroy)
