@@ -2,14 +2,6 @@ from tkinter import *
 
 
 root = Tk()
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-window_width = screen_width / 2
-window_height = screen_height / 2
-horiz_pad = screen_width / 2 - window_width / 2
-vert_pad = screen_height / 2 - window_height / 2
-root.geometry(f'{int(window_width)}x{int(window_height)}+{int(horiz_pad)}+{int(vert_pad)}')
-root.resizable(True, True)
 root.attributes('-fullscreen', True)
 root.title('Tkinter Window Demo')
 
@@ -27,7 +19,8 @@ def key_pressed(event):
     if event.char == text_content[cur_index]:
         cur_index += 1
         text.config(state=NORMAL)
-        text.tag_add("typed", f"1.{cur_index-1}", f"1.{cur_index}")
+        text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
+        text.tag_add("previous", f"1.0", f"1.{cur_index}")
         text.config(state=DISABLED)
 
 
@@ -39,8 +32,10 @@ text = Text(
     root,
     font=("Helvetica", 14)
 )
-text.tag_config("typed", foreground="red")
-text.insert(INSERT, text_content[cur_index:])
+text.insert(INSERT, text_content)
+text.tag_config("current", background="green", foreground="white")
+text.tag_config("previous", background="white", foreground="green")
+text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
 text.config(state=DISABLED)
 text.pack(ipadx=10, ipady=10)
 
