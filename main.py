@@ -74,10 +74,9 @@ main_text = Text(
     font=("Consolas", 14)
 )
 
-time_minute = 0
 char_per_minutes = 0
 
-speed_rate_label = Label(text=f"Скорость:\n{char_per_minutes}ЗН./МИН",
+speed_rate_label = Label(text=f"Скорость:\n{char_per_minutes} зн./мин",
                          width=20,
                          height=10)
 
