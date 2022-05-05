@@ -3,7 +3,13 @@ from tkinter import ttk
 
 
 root = tk.Tk()
-root.geometry('300x200+50+50')
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+window_width = screen_width / 2
+window_height = screen_height / 2
+horiz_pad = screen_width / 2 - window_width / 2
+vert_pad = screen_height / 2 - window_height / 2
+root.geometry(f'{int(window_width)}x{int(window_height)}+{int(horiz_pad)}+{int(vert_pad)}')
 root.resizable(False, False)
 root.title('Tkinter Window Demo')
 
