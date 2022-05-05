@@ -27,8 +27,7 @@ def key_pressed(event):
     if event.char == text_content[cur_index]:
         cur_index += 1
         text.config(state=NORMAL)
-        text.delete("1.0", "end")
-        text.insert(INSERT, text_content[cur_index:])
+        text.tag_add("typed", f"1.{cur_index-1}", f"1.{cur_index}")
         text.config(state=DISABLED)
 
 
@@ -40,6 +39,7 @@ text = Text(
     root,
     font=("Helvetica", 14)
 )
+text.tag_config("typed", foreground="red")
 text.insert(INSERT, text_content[cur_index:])
 text.config(state=DISABLED)
 text.pack(ipadx=10, ipady=10)
