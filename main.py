@@ -23,17 +23,16 @@ def key_pressed(event):
     global text, cur_index, label
     if event.char == text[cur_index]:
         cur_index += 1
-        label.config(text=text[cur_index:cur_index + symbols_at_a_time])
+        label.config(text=text[cur_index:])
 
 
 cur_index = 0
-symbols_at_a_time = 10
 text = get_text()
 
 
 label = ttk.Label(
     root,
-    text=text[cur_index:symbols_at_a_time],
+    text=text[cur_index:],
     font=("Helvetica", 14)
 )
 label.pack(ipadx=10, ipady=10)
