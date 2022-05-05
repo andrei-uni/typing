@@ -1,5 +1,8 @@
 from tkinter import *
+from ctypes import windll
 
+
+windll.shcore.SetProcessDpiAwareness(1)
 
 root = Tk()
 root.attributes('-fullscreen', True)
@@ -36,12 +39,12 @@ text_content = get_text()
 
 text = Text(
     root,
-    font=("Helvetica", 14)
+    font=("Consolas", 14)
 )
 text.insert(INSERT, text_content)
 text.tag_config("current", background="green", foreground="white")
 text.tag_config("previous", background="white", foreground="green")
-text.tag_config("wrong", background="#ff5a60", foreground="white")
+text.tag_config("wrong", foreground="red")
 
 text.tag_add("current", f"1.{cur_index}", f"1.{cur_index+1}")
 text.config(state=DISABLED)
