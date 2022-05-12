@@ -1,7 +1,7 @@
 from tkinter import *
 from ctypes import windll
 import random
-import datetime
+import time
 
 windll.shcore.SetProcessDpiAwareness(1)
 
@@ -15,8 +15,8 @@ button.pack(side=BOTTOM)
 
 
 def get_text():
-    number = random.randrange(1, 5, 1)
-    with open(str(number) + ".txt", 'r', encoding="utf-8") as f:
+    number = random.randrange(1, 9)
+    with open("Texts/" + str(number) + ".txt", 'r', encoding="utf-8") as f:
         return f.read()
 
 
@@ -28,9 +28,10 @@ def calculate_correctness_percentage():
 
 
 def key_pressed(event):
-    global text_len, text_content, cur_index, main_text, mistook_times, correctness_percentage, mistook_letter, percentage_label, char_per_minutes, start_time
+    global text_len, text_content, cur_index, main_text, mistook_times, correctness_percentage,\
+        mistook_letter, percentage_label, char_per_minutes, start_time
     if cur_index == 0:
-        start_time = datetime.datetime.now()
+        start_time = time.time()
     if event.char == "":
         return
     main_text.config(state=NORMAL)
@@ -39,9 +40,9 @@ def key_pressed(event):
         cur_index += 1
         main_text.tag_add("current", f"1.{cur_index}", f"1.{cur_index + 1}")
         main_text.tag_add("previous", f"1.0", f"1.{cur_index}")
-        if cur_index == text_len:
-            char_per_minutes = (cur_index / (datetime.datetime.now().minute - start_time.minute))
-            speed_rate_label.config(text=f"Скорость:\n{char_per_minutes}зн./МИН")
+        if cur_index != 0:
+            char_per_minutes = int((cur_index / (time.time() - start_time)) * 60)
+            speed_rate_label.config(text=f"Скорость:\n{char_per_minutes} зн./мин")
     else:
         if not mistook_letter:
             mistook_times += 1
@@ -77,7 +78,7 @@ main_text = Text(
 char_per_minutes = 0
 
 speed_rate_label = Label(text=f"Скорость:\n{char_per_minutes} зн./мин",
-                         width=20,
+                         width=10,
                          height=10)
 
 speed_rate_label.pack(side=RIGHT)
