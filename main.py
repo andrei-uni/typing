@@ -42,7 +42,7 @@ def key_pressed(event):
         main_text.tag_add("previous", f"1.0", f"1.{cur_index}")
         if cur_index != 0:
             char_per_minutes = int((cur_index / (time.time() - start_time)) * 60)
-            speed_rate_label.config(text=f"Скорость:\n{char_per_minutes} зн./мин")
+            speed_rate_label.config(text=get_speed_rate_text_template(char_per_minutes))
     else:
         if not mistook_letter:
             mistook_times += 1
@@ -52,7 +52,14 @@ def key_pressed(event):
     main_text.config(state=DISABLED)
 
     correctness_percentage = int(calculate_correctness_percentage())
-    percentage_label.config(text=f"Точность:\n {correctness_percentage}%")
+    percentage_label.config(text=get_accuracy_text_template(correctness_percentage))
+
+
+def get_accuracy_text_template(percentage):
+    return f"Точность:\n {percentage}%"
+
+def get_speed_rate_text_template(rate):
+    return f"Скорость:\n {rate} зн./мин"
 
 
 cur_index = 0
@@ -64,7 +71,7 @@ correctness_percentage = 100
 mistook_letter = False
 
 percentage_label = Label(
-    text=f"Точность:\n {correctness_percentage}%",
+    text=get_accuracy_text_template(correctness_percentage),
     width=10,
     height=10,
 )
@@ -77,7 +84,7 @@ main_text = Text(
 
 char_per_minutes = 0
 
-speed_rate_label = Label(text=f"Скорость:\n{char_per_minutes} зн./мин",
+speed_rate_label = Label(text=get_speed_rate_text_template(char_per_minutes),
                          width=10,
                          height=10)
 
