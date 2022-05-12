@@ -23,7 +23,7 @@ def get_text():
         return f.read()
 
 
-def create_text():
+def create_frame():
     main_text = Text(root,
                      font=("Consolas", 14))
 
@@ -60,8 +60,8 @@ def add_tag(name, first, second):
 def key_pressed(event):
     global cur_index, mistook_times, mistook_letter, start_time
     if cur_index == 0:
-        start_time = time.time()
-    if event.char == "":
+        start_time = time.perf_counter()
+    if event.char == "" or cur_index == text_len:
         return
     main_text.config(state=NORMAL)
     if event.char == text_content[cur_index]:
@@ -70,7 +70,7 @@ def key_pressed(event):
         add_tag("current", cur_index, cur_index + 1)
         add_tag("previous", cur_index - 1, cur_index)
         if cur_index != 0:
-            char_per_minutes = int((cur_index / (time.time() - start_time)) * 60)
+            char_per_minutes = int((cur_index / (time.perf_counter() - start_time)) * 60)
             speed_rate_label.config(text=get_speed_rate_text_template(char_per_minutes))
     else:
         if not mistook_letter:
@@ -107,7 +107,7 @@ percentage_label = create_statistic(get_accuracy_text_template, correctness_perc
 
 speed_rate_label = create_statistic(get_speed_rate_text_template, char_per_minutes, side=RIGHT)
 
-main_text = create_text()
+main_text = create_frame()
 
 add_tag("current", cur_index, cur_index + 1)
 
