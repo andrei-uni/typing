@@ -3,6 +3,7 @@ from ctypes import windll
 import time
 import Speed_Statistics as sp
 import Accuracy_Statistics as ac
+import Settings as settings
 
 
 class Application:
@@ -21,6 +22,15 @@ class Application:
         self.setup_frame()
         self.accuracy_stat.add_statistic_in_app(LEFT)
         self.speed_stat.add_statistic_in_app(RIGHT)
+        self.sett = settings.Settings()
+
+        ###############
+        btn = Button(self.root, text="Settings")
+        btn.bind("<Button>", lambda _: settings.Settings().run())
+        btn.pack(pady=10)
+        ################
+
+        self.sett.add_language_label()
 
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
@@ -59,6 +69,9 @@ class Application:
             self.add_highlight_for_symbol("wrong", self.cur_index, self.cur_index + 1)
 
         self.accuracy_stat.update_statistic()
+
+    # def aO(self):
+    #     self.sett
 
     def run(self):
         self.root.mainloop()
