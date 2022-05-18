@@ -6,9 +6,13 @@ import time
 windll.shcore.SetProcessDpiAwareness(1)
 
 root = Tk()
-root.attributes('-fullscreen', True)
-root["bg"] = "#54c6ff"
-root.title('Tkinter Window Demo')
+
+
+def setup_root():
+    global root
+    root.attributes('-fullscreen', True)
+    root["bg"] = "#54c6ff"
+    root.title('Tkinter Window Demo')
 
 
 def add_button(text, width, height, bg, fg, command, side):
@@ -65,13 +69,13 @@ def key_pressed(event):
         return
     main_text.config(state=NORMAL)
     if event.char == text_content[cur_index]:
-        mistook_letter = False
+        # mistook_letter = False
         cur_index += 1
         add_tag("current", cur_index, cur_index + 1)
         add_tag("previous", cur_index - 1, cur_index)
         if cur_index != 0:
-            char_per_minutes = int((cur_index / (time.perf_counter() - start_time)) * 60)
-            speed_rate_label.config(text=get_speed_rate_text_template(char_per_minutes))
+             char_per_minutes = int((cur_index / (time.perf_counter() - start_time)) * 60)
+             speed_rate_label.config(text=get_speed_rate_text_template(char_per_minutes))
     else:
         if not mistook_letter:
             mistook_times += 1
@@ -91,7 +95,7 @@ def create_statistic(text, value, side):
     label.pack(side=side)
     return label
 
-
+setup_root()
 button = add_button(text="Выключить", width=15, height=5, bg="grey", fg="white", command=root.destroy, side=BOTTOM)
 
 cur_index = 0
