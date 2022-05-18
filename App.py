@@ -4,8 +4,6 @@ import time
 import Speed_Statistics as sp
 import Accuracy_Statistics as ac
 
-windll.shcore.SetProcessDpiAwareness(1)
-
 
 class Application:
     def __init__(self, text):
@@ -18,6 +16,11 @@ class Application:
                                )
         self.speed_stat = sp.Statistics(self.text_len)
         self.accuracy_stat = ac.Statistic(self.text_len)
+
+        self.setup_root()
+        self.setup_frame()
+        self.accuracy_stat.add_statistic_in_app(LEFT)
+        self.speed_stat.add_statistic_in_app(RIGHT)
 
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
@@ -57,14 +60,12 @@ class Application:
 
         self.accuracy_stat.update_statistic()
 
-    def start(self):
-        self.setup_root()
-        self.setup_frame()
-        self.accuracy_stat.add_statistic_in_app(LEFT)
-        self.speed_stat.add_statistic_in_app(RIGHT)
+    def run(self):
         self.root.mainloop()
 
 
 if __name__ == "__main__":
+    windll.shcore.SetProcessDpiAwareness(1)
+
     app = Application("Эта книга адресована")
-    app.start()
+    app.run()
