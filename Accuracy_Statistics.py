@@ -19,7 +19,6 @@ class Statistic:
                            height=10
                            )
         self.label.pack(side=side)
-        #root.protocol("WM_DELETE_WINDOW", on_closing)
 
     def update_statistic(self):
         self.cur_index += 1
