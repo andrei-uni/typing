@@ -6,6 +6,7 @@ from pathlib import Path
 
 import Accuracy_Statistics as ac
 import Settings as st
+import Speed_Statistics as sp
 
 
 class Application:
@@ -17,12 +18,13 @@ class Application:
         self.off_button = None
         self.settings_button = None
         self.restart_btn = None
+
         self.settings = st.Settings(language)
         self.text = self.open_file(self.settings.language_selected.get())
         self.text_len = len(self.text)
 
-        self.speed_stat = sp.Statistics(self.text_len)
-        self.accuracy_stat = ac.Statistic(self.text_len)
+        self.speed_stat = sp.Statistics()
+        self.accuracy_stat = ac.Statistic(self)
 
         self.setup_root()
         self.setup_frame()
@@ -47,6 +49,7 @@ class Application:
         self.main_label.config(state=DISABLED)
         self.main_label.pack(ipadx=10, ipady=10)
         self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
+
         self.accuracy_stat.add_statistic_in_app(LEFT)
         self.speed_stat.add_statistic_in_app(RIGHT)
 
@@ -57,12 +60,11 @@ class Application:
         if event.char == "" or self.cur_index == self.text_len:
             return
         if self.cur_index == 0:
-            self.speed_stat.start_time = time.perf_counter()
+            self.speed_stat.start_time()
 
         if event.char == self.text[self.cur_index]:
             self.accuracy_stat.mistook_letter = False
             self.cur_index += 1
-            self.accuracy_stat.cur_index += 1
             self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
             self.add_highlight_for_symbol("previous", self.cur_index - 1, self.cur_index)
             if self.cur_index != 1:
@@ -97,7 +99,7 @@ class Application:
     def restart(self):
         language = self.settings.language_selected.get()
         self.close()
-        Application(language=language).run()
+        Application(language).run()
 
     def add_buttons(self):
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
