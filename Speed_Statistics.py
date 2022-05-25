@@ -13,7 +13,7 @@ class Statistics:
     def get_speed_rate_text_template(self):
         return f"Скорость:\n {self.rate} зн./мин"
 
-    def start_time(self):
+    def start_timer(self):
         self.start_time = time.perf_counter()
 
     def add_statistic_in_app(self, side):

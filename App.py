@@ -60,7 +60,7 @@ class Application:
         if event.char == "" or self.cur_index == self.text_len:
             return
         if self.cur_index == 0:
-            self.speed_stat.start_time()
+            self.speed_stat.start_timer()
 
         if event.char == self.text[self.cur_index]:
             self.accuracy_stat.mistook_letter = False
