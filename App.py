@@ -10,13 +10,14 @@ import Settings as st
 class Application:
     def __init__(self, language='Русский'):
         self.root = Tk()
+        self.root.focus_force()
         self.cur_index = 0
         self.main_label = Text(self.root, font=("Consolas", 14))
 
         self.off_button = None
         self.settings_button = None
         self.restart_btn = None
-        self.settings = st.Settings(language)
+        self.settings = st.Settings(language, self)
         self.text = self.open_file(self.settings.language_selected.get())
         self.text_len = len(self.text)
 
@@ -33,10 +34,10 @@ class Application:
         self.root.title("Клавиатурный тренажер")
         self.root.bind("<Key>", self.key_pressed)
 
-    def turn_on_settings(self):
+    def open_settings(self):
         if not self.settings.setting_on:
             self.settings.setting_on = True
-            return self.settings.run()
+            self.settings.run()
 
     def setup_frame(self):
         self.main_label.insert(INSERT, self.text)
@@ -103,14 +104,13 @@ class Application:
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
         self.off_button.pack(side=BOTTOM)
 
-        self.settings_button = Button(self.root, text="Настройки", command=self.turn_on_settings)
+        self.settings_button = Button(self.root, text="Настройки", command=self.open_settings)
         self.settings_button.pack(pady=10)
 
         self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)
         self.restart_btn.pack()
 
     def run(self):
-        self.root.deiconify()
         self.root.mainloop()
 
 

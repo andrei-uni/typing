@@ -2,9 +2,14 @@ from tkinter import *
 
 
 class Settings(Tk):
-    def __init__(self, language):
+    def __init__(self, language, main_class):
         super().__init__()
+        self.focus_set()
+        self.attributes("-topmost", True)
+
+        self.last_language = language
         self.withdraw()
+        self.main = main_class
         self.languages = ('Русский', 'English')
         self.language_selected = StringVar(self)
         self.language_selected.set(language)
@@ -37,9 +42,13 @@ class Settings(Tk):
         self.label.config(text=self.language_selected.get())
 
     def on_closing(self):
-        self.withdraw()
-        self.update_language_label()
-        self.setting_on = False
+        if self.last_language != self.language_selected.get():
+            self.main.restart()
+        else:
+            self.withdraw()
+            self.update_language_label()
+            self.setting_on = False
 
     def run(self):
+        self.last_language = self.language_selected.get()
         self.deiconify()

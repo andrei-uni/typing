@@ -3,7 +3,6 @@ from tkinter import *
 
 
 class Statistics:
-
     def __init__(self, length):
         self.length = length
         self.cur_index = 0
@@ -27,6 +26,3 @@ class Statistics:
 
     def calculate_speed(self):
         return int((self.cur_index / (time.perf_counter() - self.start_time)) * 60)
-
-
-
