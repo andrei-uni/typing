@@ -5,8 +5,9 @@ from ctypes import windll
 from pathlib import Path
 
 import Accuracy_Statistics as ac
-import Settings as st
 import Speed_Statistics as sp
+import Settings as st
+import Records as rec
 
 
 class Application:
@@ -19,10 +20,13 @@ class Application:
         self.off_button = None
         self.settings_button = None
         self.restart_btn = None
+        self.records_button = None
+
         self.settings = st.Settings(language, self)
         self.text = self.open_file(self.settings.language_selected.get())
         self.text_len = len(self.text)
 
+        self.records = rec.Records()
         self.speed_stat = sp.Statistics()
         self.accuracy_stat = ac.Statistic(self)
 
@@ -40,6 +44,9 @@ class Application:
         if not self.settings.setting_on:
             self.settings.setting_on = True
             self.settings.run()
+
+    def open_records(self):
+        self.records.run()
 
     def setup_frame(self):
         self.main_label.insert(INSERT, self.text)
@@ -108,6 +115,9 @@ class Application:
 
         self.settings_button = Button(self.root, text="Настройки", command=self.open_settings)
         self.settings_button.pack(pady=10)
+
+        self.records_button = Button(self.root, text="Рекорды", command=self.open_records)
+        self.records_button.pack(pady=10)
 
         self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)
         self.restart_btn.pack()
