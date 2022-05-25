@@ -1,37 +1,44 @@
 from tkinter import *
 
 
-class Settings:
+class Settings(Tk):
     def __init__(self):
-        self.root = Tk()
-        self.root.withdraw()
-        self.language_options = [
-            "Русский",
-            "English"
-        ]
-        self.language_selected = StringVar()
-        self.language_selected.set(self.language_options[0])
+        super().__init__()
+        self.withdraw()
+        self.languages = ('Русский', 'English')
+        self.language_selected = StringVar(self)
+        self.language_selected.set(self.languages[0])
+
         self.label = Label(text=self.language_selected.get())
         self.label.pack(side=BOTTOM)
         self.setting_on = False
-        self.setup_option_menu()
         self.setup_master()
+        self.create_widgets()
 
-    def setup_option_menu(self):
-        OptionMenu(self.root, self.language_selected, *self.language_options).pack()
+    def create_widgets(self):
+        paddings = {'padx': 5, 'pady': 5}
+        label = Label(self, text='Язык:')
+        label.grid(column=0, row=0, sticky=W, **paddings)
+
+        option_menu = OptionMenu(
+            self,
+            self.language_selected,
+            *self.languages)
+
+        option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
     def setup_master(self):
-        self.root.title("Settings")
-        self.root.geometry("600x200")
-        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.title("Settings")
+        self.geometry("600x200")
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def update_language_label(self):
         self.label.config(text=self.language_selected.get())
 
     def on_closing(self):
-        self.root.withdraw()
+        self.withdraw()
         self.update_language_label()
         self.setting_on = False
 
     def run(self):
-        self.root.deiconify()
+        self.deiconify()

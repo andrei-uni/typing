@@ -75,7 +75,6 @@ class Application:
         self.accuracy_stat.update_statistic()
 
     def close(self):
-        self.sett.root.destroy()
         self.root.destroy()
 
     def restart(self):
