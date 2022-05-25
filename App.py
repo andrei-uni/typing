@@ -1,8 +1,9 @@
+import random
+
 from tkinter import *
 from ctypes import windll
 from pathlib import Path
-import time, os, random
-import Speed_Statistics as sp
+
 import Accuracy_Statistics as ac
 import Settings as st
 
@@ -82,13 +83,12 @@ class Application:
         else:
             raise Exception("Incorrect Language")
 
-        texts_dir = f"Texts/{sel_lang}/"
-        files = [i for i in os.listdir(texts_dir)]
+        texts_dir = Path("Texts", sel_lang)
+        files = [i for i in texts_dir.iterdir()]
+        random_file = random.choice(files)
 
-        path = Path(f"{texts_dir}{random.choice(files)}")
-
-        with path.open(encoding="utf-8") as file:
-            return file.read()
+        with random_file.open(encoding="utf-8") as f:
+            return f.read()
 
     def close(self):
         self.settings.destroy()
