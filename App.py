@@ -1,4 +1,5 @@
 import random
+import datetime
 
 from tkinter import *
 from ctypes import windll
@@ -8,6 +9,7 @@ import Accuracy_Statistics as ac
 import Speed_Statistics as sp
 import Settings as st
 import Records as rec
+from RecordType import RecordType
 
 
 class Application:
@@ -15,7 +17,7 @@ class Application:
         self.root = Tk()
         self.root.focus_force()
         self.cur_index = 0
-        self.main_label = Text(self.root, font=("Consolas", 14))
+        self.main_label = Text(self.root, font=("Consolas", 14), bg='white',fg='#2a2a2a',insertontime=0)
 
         self.off_button = None
         self.settings_button = None
@@ -23,12 +25,12 @@ class Application:
         self.records_button = None
 
         self.settings = st.Settings(language, self)
-        self.text = self.open_file(self.settings.language_selected.get())
-        self.text_len = len(self.text)
-
         self.records = rec.Records()
         self.speed_stat = sp.Statistics()
         self.accuracy_stat = ac.Statistic(self)
+
+        self.text = self.open_file(self.settings.language_selected.get())
+        self.text_len = len(self.text)
 
         self.setup_root()
         self.setup_frame()
@@ -46,7 +48,9 @@ class Application:
             self.settings.run()
 
     def open_records(self):
-        self.records.run()
+        if not self.records.records_on:
+            self.records.records_on = True
+            self.records.run()
 
     def setup_frame(self):
         self.main_label.insert(INSERT, self.text)
@@ -62,6 +66,13 @@ class Application:
 
     def add_highlight_for_symbol(self, name, first, second):
         self.main_label.tag_add(name, f"1.{first}", f"1.{second}")
+
+    def add_record(self):
+        self.records.add_new_record(RecordType(datetime.datetime.today().strftime('%H:%M:%S'),
+                                               self.speed_stat.rate,
+                                               self.accuracy_stat.percent,
+                                               datetime.datetime.today().strftime('%d.%m.%y'),
+                                               self.random_file))
 
     def key_pressed(self, event):
         if event.char == "" or self.cur_index == self.text_len:
@@ -82,7 +93,8 @@ class Application:
             if not self.accuracy_stat.mistook_letter:
                 self.accuracy_stat.mistook_letter = True
             self.add_highlight_for_symbol("wrong", self.cur_index, self.cur_index + 1)
-
+        if self.cur_index == self.text_len:
+            self.add_record()
         self.accuracy_stat.update_statistic()
 
     def open_file(self, lang):
@@ -95,13 +107,14 @@ class Application:
 
         texts_dir = Path("Texts", sel_lang)
         files = [i for i in texts_dir.iterdir()]
-        random_file = random.choice(files)
+        self.random_file = random.choice(files)
 
-        with random_file.open(encoding="utf-8") as f:
+        with self.random_file.open(encoding="utf-8") as f:
             return f.read()
 
     def close(self):
         self.settings.destroy()
+        self.records.destroy()
         self.root.destroy()
 
     def restart(self):

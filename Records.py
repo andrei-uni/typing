@@ -11,6 +11,7 @@ class Records(Tk):
         super().__init__()
         self.setup_master()
         self.withdraw()
+        self.records_on = False
 
         self.main_frame = None
 
@@ -23,6 +24,11 @@ class Records(Tk):
         self.geometry("600x500")
         self.focus_set()
         self.attributes("-topmost", True)
+        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+    def on_closing(self):
+        self.withdraw()
+        self.records_on = False
 
     def setup_table(self):
         columns = ('time', 'speed', 'accuracy', 'date', 'text')
@@ -50,7 +56,8 @@ class Records(Tk):
             path.touch(mode=0o644)
 
         with path.open("a+") as f:
-            print(",".join(vars(record).keys()), file=f)
+            values = [str(i) for i in vars(record).values()]
+            print(",".join(values), file=f)
 
     def run(self):
         self.deiconify()
