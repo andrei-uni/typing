@@ -2,12 +2,12 @@ from tkinter import *
 
 
 class Settings(Tk):
-    def __init__(self):
+    def __init__(self, language):
         super().__init__()
         self.withdraw()
         self.languages = ('Русский', 'English')
         self.language_selected = StringVar(self)
-        self.language_selected.set(self.languages[0])
+        self.language_selected.set(language)
 
         self.label = Label(text=self.language_selected.get())
         self.label.pack(side=BOTTOM)

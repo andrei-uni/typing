@@ -91,7 +91,7 @@ class Application:
             return file.read()
 
     def close(self):
-        self.settings.root.destroy()
+        self.settings.destroy()
         self.root.destroy()
 
     def restart(self):
