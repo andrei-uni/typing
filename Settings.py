@@ -28,12 +28,13 @@ class Settings(Tk):
         option_menu = OptionMenu(
             self,
             self.language_selected,
-            *self.languages)
+            *self.languages
+        )
 
         option_menu.grid(column=1, row=0, sticky=W, **paddings)
 
     def setup_master(self):
-        self.title("Settings")
+        self.title("Настройки")
         self.geometry("600x200")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
 

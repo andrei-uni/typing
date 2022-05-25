@@ -1,10 +1,12 @@
+import random
+
 from tkinter import *
 from ctypes import windll
 from pathlib import Path
-import time, os, random
-import Speed_Statistics as sp
+
 import Accuracy_Statistics as ac
 import Settings as st
+import Speed_Statistics as sp
 
 
 class Application:
@@ -21,8 +23,8 @@ class Application:
         self.text = self.open_file(self.settings.language_selected.get())
         self.text_len = len(self.text)
 
-        self.speed_stat = sp.Statistics(self.text_len)
-        self.accuracy_stat = ac.Statistic(self.text_len)
+        self.speed_stat = sp.Statistics()
+        self.accuracy_stat = ac.Statistic(self)
 
         self.setup_root()
         self.setup_frame()
@@ -47,6 +49,7 @@ class Application:
         self.main_label.config(state=DISABLED)
         self.main_label.pack(ipadx=10, ipady=10)
         self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
+
         self.accuracy_stat.add_statistic_in_app(LEFT)
         self.speed_stat.add_statistic_in_app(RIGHT)
 
@@ -57,12 +60,11 @@ class Application:
         if event.char == "" or self.cur_index == self.text_len:
             return
         if self.cur_index == 0:
-            self.speed_stat.start_time = time.perf_counter()
+            self.speed_stat.start_time()
 
         if event.char == self.text[self.cur_index]:
             self.accuracy_stat.mistook_letter = False
             self.cur_index += 1
-            self.accuracy_stat.cur_index += 1
             self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
             self.add_highlight_for_symbol("previous", self.cur_index - 1, self.cur_index)
             if self.cur_index != 1:
@@ -83,13 +85,12 @@ class Application:
         else:
             raise Exception("Incorrect Language")
 
-        texts_dir = f"Texts/{sel_lang}/"
-        files = [i for i in os.listdir(texts_dir)]
+        texts_dir = Path("Texts", sel_lang)
+        files = [i for i in texts_dir.iterdir()]
+        random_file = random.choice(files)
 
-        path = Path(f"{texts_dir}{random.choice(files)}")
-
-        with path.open(encoding="utf-8") as file:
-            return file.read()
+        with random_file.open(encoding="utf-8") as f:
+            return f.read()
 
     def close(self):
         self.settings.destroy()
@@ -98,7 +99,7 @@ class Application:
     def restart(self):
         language = self.settings.language_selected.get()
         self.close()
-        Application(language=language).run()
+        Application(language).run()
 
     def add_buttons(self):
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
