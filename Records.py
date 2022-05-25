@@ -21,7 +21,7 @@ class Records(Tk):
 
     def setup_master(self):
         self.title("Рекорды")
-        self.geometry("600x500")
+        self.geometry("800x500")
         self.focus_set()
         self.attributes("-topmost", True)
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
@@ -37,7 +37,7 @@ class Records(Tk):
 
         for i in columns:
             self.main_frame.heading(i, text=i.capitalize(), anchor=CENTER)
-            self.main_frame.column(i, width=100, anchor=CENTER)
+            self.main_frame.column(i, width=130, anchor=CENTER)
 
         self.main_frame.pack()
 
