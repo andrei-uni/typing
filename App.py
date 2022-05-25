@@ -63,6 +63,8 @@ class Application:
             self.speed_stat.start_timer()
 
         if event.char == self.text[self.cur_index]:
+            if not self.accuracy_stat.mistook_letter:
+                self.accuracy_stat.correct_times += 1
             self.accuracy_stat.mistook_letter = False
             self.cur_index += 1
             self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
@@ -71,7 +73,6 @@ class Application:
                 self.speed_stat.update_statistic()
         else:
             if not self.accuracy_stat.mistook_letter:
-                self.accuracy_stat.mistook_times += 1
                 self.accuracy_stat.mistook_letter = True
             self.add_highlight_for_symbol("wrong", self.cur_index, self.cur_index + 1)
 

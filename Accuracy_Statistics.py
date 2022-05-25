@@ -4,7 +4,7 @@ from tkinter import *
 class Statistic:
     def __init__(self, main_class):
         self.main_class = main_class
-        self.mistook_times = 0
+        self.correct_times = 0
         self.mistook_letter = False
         self.label = None
         self.percent = 100
@@ -23,4 +23,4 @@ class Statistic:
     def calculate_correctness_percent(self):
         if self.main_class.cur_index == 0:
             return 0
-        return int((self.main_class.cur_index - self.mistook_times) / self.main_class.cur_index * 100)
+        return int(self.correct_times / self.main_class.cur_index * 100)
