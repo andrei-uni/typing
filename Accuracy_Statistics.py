@@ -21,7 +21,6 @@ class Statistic:
         self.label.pack(side=side)
 
     def update_statistic(self):
-        self.cur_index += 1
         self.percentage = self.calculate_correctness_percentage()
         self.label.config(text=self.get_accuracy_text_template())
 

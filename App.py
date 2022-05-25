@@ -1,29 +1,27 @@
 from tkinter import *
 from ctypes import windll
-import time
+from pathlib import Path
+import time, os, random
 import Speed_Statistics as sp
 import Accuracy_Statistics as ac
-import Settings as settings
+import Settings as st
 
 
 class Application:
-    def __init__(self, text):
+    def __init__(self, language='Русский'):
         self.root = Tk()
-        self.text = text
         self.cur_index = 0
-        self.text_len = len(text)
-        self.main_label = Text(self.root,
-                               font=("Consolas", 14)
-                               )
+        self.main_label = Text(self.root, font=("Consolas", 14))
+
+        self.off_button = None
+        self.settings_button = None
+        self.restart_btn = None
+        self.settings = st.Settings(language)
+        self.text = self.open_file(self.settings.language_selected.get())
+        self.text_len = len(self.text)
+
         self.speed_stat = sp.Statistics(self.text_len)
         self.accuracy_stat = ac.Statistic(self.text_len)
-        self.sett = settings.Settings()
-
-        ###############
-        self.off_button = Button(text="Выключить", bg="grey", fg="white", command=self.close)
-        self.btn = Button(self.root, text="Settings")
-        #self.restart_btn = Button(self.root, text="Restart")
-        ################
 
         self.setup_root()
         self.setup_frame()
@@ -32,13 +30,13 @@ class Application:
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
         self.root["bg"] = "#54c6ff"
-        self.root.title('Tkinter Window Demo')
+        self.root.title("Клавиатурный тренажер")
         self.root.bind("<Key>", self.key_pressed)
 
     def turn_on_settings(self):
-        if not self.sett.setting_on:
-            self.sett.setting_on = True
-            return self.sett.run()
+        if not self.settings.setting_on:
+            self.settings.setting_on = True
+            return self.settings.run()
 
     def setup_frame(self):
         self.main_label.insert(INSERT, self.text)
@@ -59,9 +57,11 @@ class Application:
             return
         if self.cur_index == 0:
             self.speed_stat.start_time = time.perf_counter()
+
         if event.char == self.text[self.cur_index]:
             self.accuracy_stat.mistook_letter = False
             self.cur_index += 1
+            self.accuracy_stat.cur_index += 1
             self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
             self.add_highlight_for_symbol("previous", self.cur_index - 1, self.cur_index)
             if self.cur_index != 1:
@@ -74,27 +74,48 @@ class Application:
 
         self.accuracy_stat.update_statistic()
 
+    def open_file(self, lang):
+        if lang == "Русский":
+            sel_lang = "ru"
+        elif lang == "English":
+            sel_lang = "en"
+        else:
+            raise Exception("Incorrect Language")
+
+        texts_dir = f"Texts/{sel_lang}/"
+        files = [i for i in os.listdir(texts_dir)]
+
+        path = Path(f"{texts_dir}{random.choice(files)}")
+
+        with path.open(encoding="utf-8") as file:
+            return file.read()
+
     def close(self):
-        self.sett.root.destroy()
+        self.settings.root.destroy()
         self.root.destroy()
 
     def restart(self):
-        self.root.destroy()
-        Application("Эта книга адресована").run()
+        language = self.settings.language_selected.get()
+        self.close()
+        Application(language=language).run()
 
     def add_buttons(self):
-        #self.restart_btn.bind("<Button>", lambda _: self.restart())
-        self.btn.bind("<Button>", lambda _: self.turn_on_settings())
-        self.btn.pack(pady=10)
-        #self.restart_btn.pack()
+        self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
         self.off_button.pack(side=BOTTOM)
 
+        self.settings_button = Button(self.root, text="Настройки", command=self.turn_on_settings)
+        self.settings_button.pack(pady=10)
+
+        self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)
+        self.restart_btn.pack()
+
     def run(self):
+        self.root.deiconify()
         self.root.mainloop()
 
 
 if __name__ == "__main__":
     windll.shcore.SetProcessDpiAwareness(1)
 
-    app = Application("Эта книга адресована")
+    app = Application()
     app.run()

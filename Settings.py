@@ -2,7 +2,7 @@ from tkinter import *
 
 
 class Settings:
-    def __init__(self):
+    def __init__(self, language):
         self.root = Tk()
         self.root.withdraw()
         self.language_options = [
@@ -10,7 +10,7 @@ class Settings:
             "English"
         ]
         self.language_selected = StringVar()
-        self.language_selected.set(self.language_options[0])
+        self.language_selected.set(language)
         self.label = Label(text=self.language_selected.get())
         self.label.pack(side=BOTTOM)
         self.setting_on = False
@@ -26,6 +26,7 @@ class Settings:
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def update_language_label(self):
+        self.label.pack(side=BOTTOM)
         self.label.config(text=self.language_selected.get())
 
     def on_closing(self):
