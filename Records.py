@@ -36,7 +36,10 @@ class Records(Tk):
         self.main_frame['show'] = 'headings'
 
         for i in columns:
-            self.main_frame.heading(i, text=i.capitalize(), anchor=CENTER)
+            self.main_frame.heading(i,
+                                    text=i.capitalize(), anchor=CENTER,
+                                    command=lambda _col=i: self.sort_treeview(_col, True)
+                                    )
             self.main_frame.column(i, width=130, anchor=CENTER)
 
         self.main_frame.pack()
@@ -58,6 +61,23 @@ class Records(Tk):
         with path.open("a+") as f:
             values = [str(i) for i in vars(record).values()]
             print(",".join(values), file=f)
+
+    def sort_treeview(self, column, reverse: bool):
+        try:
+            data_list = [(int(self.main_frame.set(k, column)), k) for k in self.main_frame.get_children("")]
+        except Exception:
+            data_list = [(self.main_frame.set(k, column), k) for k in self.main_frame.get_children("")]
+
+        data_list.sort(reverse=reverse)
+
+        for index, (val, k) in enumerate(data_list):
+            self.main_frame.move(k, "", index)
+
+        self.main_frame.heading(
+            column=column,
+            text=column.title(),
+            command=lambda _col=column: self.sort_treeview(_col, not reverse)
+        )
 
     def run(self):
         self.deiconify()
