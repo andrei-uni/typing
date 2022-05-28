@@ -1,9 +1,9 @@
 import random
 import datetime
 import time
+import platform
 
 from tkinter import *
-from ctypes import windll
 from pathlib import Path
 
 import Accuracy_Statistics as ac
@@ -135,7 +135,9 @@ class Application:
 
 
 if __name__ == "__main__":
-    windll.shcore.SetProcessDpiAwareness(1)
+    if platform.system() == "Windows":
+        from ctypes import windll
+        windll.shcore.SetProcessDpiAwareness(1)
 
     app = Application()
     app.run()
