@@ -1,5 +1,6 @@
 import random
 import datetime
+import time
 
 from tkinter import *
 from ctypes import windll
@@ -13,11 +14,12 @@ from RecordType import RecordType
 
 
 class Application:
-    def __init__(self, language='Русский'):
+    def __init__(self, language='Русский', bg = "#54c6ff"):
         self.root = Tk()
         self.root.focus_force()
+        self.bg = bg
         self.cur_index = 0
-        self.main_label = Text(self.root, font=("Consolas", 14), bg='white',fg='#2a2a2a',insertontime=0)
+        self.main_label = Text(self.root, font=("Consolas", 14), bg="white", fg='#2a2a2a', insertontime=0)
 
         self.off_button = None
         self.settings_button = None
@@ -25,7 +27,7 @@ class Application:
         self.records_button = None
 
         self.settings = st.Settings(language, self)
-        self.records = rec.Records()
+        self.records = rec.Records(self)
         self.speed_stat = sp.Statistics()
         self.accuracy_stat = ac.Statistic(self)
 
@@ -38,19 +40,10 @@ class Application:
 
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
-        self.root["bg"] = "#54c6ff"
+        self.root["bg"] = self.bg
+        self.root.focus_set()
         self.root.title("Клавиатурный тренажер")
         self.root.bind("<Key>", self.key_pressed)
-
-    def open_settings(self):
-        if not self.settings.setting_on:
-            self.settings.setting_on = True
-            self.settings.run()
-
-    def open_records(self):
-        if not self.records.records_on:
-            self.records.records_on = True
-            self.records.run()
 
     def setup_frame(self):
         self.main_label.insert(INSERT, self.text)
@@ -68,11 +61,12 @@ class Application:
         self.main_label.tag_add(name, f"1.{first}", f"1.{second}")
 
     def add_record(self):
-        self.records.add_new_record(RecordType(datetime.datetime.today().strftime('%H:%M:%S'),
+        self.records.add_new_record(RecordType(f'{int(time.perf_counter() - self.speed_stat.start_time)} сек.',
                                                self.speed_stat.rate,
                                                self.accuracy_stat.percent,
-                                               datetime.datetime.today().strftime('%d.%m.%y'),
-                                               self.random_file))
+                                               datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S'),
+                                               str(self.random_file)[6:-4].replace('\\', ''))
+                                    )
 
     def key_pressed(self, event):
         if event.char == "" or self.cur_index == self.text_len:
@@ -113,23 +107,24 @@ class Application:
             return f.read()
 
     def close(self):
-        self.settings.destroy()
-        self.records.destroy()
+        self.settings.root.destroy()
+        self.records.root.destroy()
         self.root.destroy()
 
     def restart(self):
+        bg = self.root['bg']
         language = self.settings.language_selected.get()
         self.close()
-        Application(language).run()
+        Application(language, bg).run()
 
     def add_buttons(self):
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
         self.off_button.pack(side=BOTTOM)
 
-        self.settings_button = Button(self.root, text="Настройки", command=self.open_settings)
+        self.settings_button = Button(self.root, text="Настройки", command=self.settings.run)
         self.settings_button.pack(pady=10)
 
-        self.records_button = Button(self.root, text="Рекорды", command=self.open_records)
+        self.records_button = Button(self.root, text="Рекорды", command=self.records.run)
         self.records_button.pack(pady=10)
 
         self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)

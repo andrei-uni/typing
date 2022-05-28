@@ -4,35 +4,32 @@ from tkinter import ttk
 from RecordType import RecordType
 
 
-class Records(Tk):
+class Records():
     FILENAME = 'records.txt'
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, main_class):
+        self.root = Toplevel(main_class.root)
         self.setup_master()
-        self.withdraw()
-        self.records_on = False
+        self.root.withdraw()
 
         self.main_frame = None
 
         self.setup_table()
-
         self.set_records_from_file()
 
     def setup_master(self):
-        self.title("Рекорды")
-        self.geometry("800x500")
-        self.focus_set()
-        self.attributes("-topmost", True)
-        self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.root.title("Рекорды")
+        self.root.geometry("1200x500")
+        self.root.focus_set()
+        self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def on_closing(self):
-        self.withdraw()
-        self.records_on = False
+        self.root.withdraw()
+        self.root.grab_release()
 
     def setup_table(self):
         columns = ('time', 'speed', 'accuracy', 'date', 'text')
-        self.main_frame = ttk.Treeview(self, columns=columns)
+        self.main_frame = ttk.Treeview(self.root, columns=columns)
         self.main_frame['show'] = 'headings'
 
         for i in columns:
@@ -40,7 +37,7 @@ class Records(Tk):
                                     text=i.capitalize(), anchor=CENTER,
                                     command=lambda _col=i: self.sort_treeview(_col, True)
                                     )
-            self.main_frame.column(i, width=130, anchor=CENTER)
+            self.main_frame.column(i, width=200, anchor=CENTER)
 
         self.main_frame.pack()
 
@@ -60,7 +57,9 @@ class Records(Tk):
 
         with path.open("a+") as f:
             values = [str(i) for i in vars(record).values()]
-            print(",".join(values), file=f)
+            value = ",".join(values)
+            print(value, file=f)
+            self.main_frame.insert('', 'end', values=value.split(","))
 
     def sort_treeview(self, column, reverse: bool):
         try:
@@ -80,4 +79,5 @@ class Records(Tk):
         )
 
     def run(self):
-        self.deiconify()
+        self.root.deiconify()
+        self.root.grab_set()
