@@ -14,11 +14,13 @@ from RecordType import RecordType
 
 
 class Application:
-    def __init__(self, language='Русский', bg="#54c6ff"):
+    def __init__(self, custom_file='', language='Русский', bg="#54c6ff"):
         self.root = Tk()
         self.root.focus_force()
         self.bg = bg
         self.cur_index = 0
+        self.filename = None
+
         self.main_label = Text(self.root, font=("Consolas", 14), bg="white", fg='#2a2a2a', insertontime=0)
 
         self.off_button = None
@@ -31,7 +33,11 @@ class Application:
         self.speed_stat = sp.Statistics()
         self.accuracy_stat = ac.Statistic(self)
 
-        self.text = self.open_file(self.settings.language_selected.get())
+        if custom_file == '':
+            self.text = self.open_preset_file(self.settings.language_selected.get())
+        else:
+            self.text = self.open_custom_file(custom_file)
+
         self.text_len = len(self.text)
 
         self.setup_root()
@@ -65,7 +71,8 @@ class Application:
                                                self.speed_stat.rate,
                                                self.accuracy_stat.percent,
                                                datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S'),
-                                               str(self.random_file)[6:-4].replace('\\', ''))
+                                               self.filename
+                                               )
                                     )
 
     def key_pressed(self, event):
@@ -91,7 +98,7 @@ class Application:
             self.add_record()
         self.accuracy_stat.update_statistic()
 
-    def open_file(self, lang):
+    def open_preset_file(self, lang):
         if lang == "Русский":
             sel_lang = "ru"
         elif lang == "English":
@@ -101,21 +108,28 @@ class Application:
 
         texts_dir = Path("Texts", sel_lang)
         files = [i for i in texts_dir.iterdir()]
-        self.random_file = random.choice(files)
+        self.filename = random.choice(files)
 
-        with self.random_file.open(encoding="utf-8") as f:
-            return f.read()
+        return self.open_file(self.filename)
+
+    def open_custom_file(self, file):
+        self.filename = file
+        return self.open_file(Path(file))
+
+    def open_file(self, file: Path):
+        with file.open(encoding="utf-8") as f:
+            return f.read().strip()
 
     def close(self):
         self.settings.root.destroy()
         self.records.root.destroy()
         self.root.destroy()
 
-    def restart(self):
+    def restart(self, custom_file=''):
         bg = self.root['bg']
         language = self.settings.language_selected.get()
         self.close()
-        Application(language, bg).run()
+        Application(custom_file, language, bg).run()
 
     def add_buttons(self):
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
