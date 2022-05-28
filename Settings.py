@@ -4,11 +4,11 @@ from tkinter import colorchooser
 
 class Settings():
     def __init__(self, language, main_class):
+        self.main = main_class
         self.root = Toplevel(main_class.root)
         self.save_btn = None
 
         self.last_language = language
-        self.main = main_class
         self.languages = ('Русский', 'English')
         self.language_selected = StringVar(self.root)
         self.language_selected.set(language)
@@ -61,11 +61,9 @@ class Settings():
             else:
                 self.root.withdraw()
                 self.update_language_label()
-                self.setting_on = False
         else:
             self.language_selected.set(self.last_language)
             self.root.withdraw()
-            self.setting_on = False
         self.root.grab_release()
 
     def run(self):

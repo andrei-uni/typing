@@ -14,7 +14,7 @@ from RecordType import RecordType
 
 
 class Application:
-    def __init__(self, language='Русский', bg = "#54c6ff"):
+    def __init__(self, language='Русский', bg="#54c6ff"):
         self.root = Tk()
         self.root.focus_force()
         self.bg = bg
@@ -41,7 +41,7 @@ class Application:
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
         self.root["bg"] = self.bg
-        self.root.focus_set()
+        self.root.focus_force()
         self.root.title("Клавиатурный тренажер")
         self.root.bind("<Key>", self.key_pressed)
 
