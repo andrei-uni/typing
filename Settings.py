@@ -32,6 +32,8 @@ class Settings():
         option_menu.grid(column=1, row=0, sticky=W, **paddings)
         self.save_btn = Button(self.root, text="Сохранить", command=self.save_closing)
         self.save_btn.place(x=330, y=140)
+        self.switch_music = Button(self.root, text="Звук", command=self.main.off_music)
+        self.switch_music.place(x=200, y=100)
 
         self.btn = Button(self.root, text="Выберите цвет", command=self.onChoose)
         self.btn.place(x=10, y=140)

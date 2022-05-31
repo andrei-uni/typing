@@ -2,6 +2,7 @@ import random
 import datetime
 import time
 import platform
+import pygame
 
 from tkinter import *
 from pathlib import Path
@@ -37,6 +38,7 @@ class Application:
         self.setup_root()
         self.setup_frame()
         self.add_buttons()
+        self.play_music()
 
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
@@ -105,6 +107,26 @@ class Application:
 
         with self.random_file.open(encoding="utf-8") as f:
             return f.read()
+
+    def play_music(self):
+        pygame.init()
+        music_dir = Path("Music")
+        tracks = [i for i in music_dir.iterdir()]
+        pygame.mixer.music.load(random.choice(tracks))
+        for music in tracks:
+            pygame.mixer.music.queue(music)
+        pygame.mixer.music.play()
+
+    def on_music(self):
+        pygame.mixer.music.unpause()
+        self.settings.switch_music['command'] = self.off_music
+
+    def off_music(self):
+        self.settings.switch_music['command'] = self.on_music
+        pygame.mixer.music.pause()
+
+    def next_track(self):
+        pygame.mixer.music.play()
 
     def close(self):
         self.settings.root.destroy()
