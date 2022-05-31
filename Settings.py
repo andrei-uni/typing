@@ -1,19 +1,23 @@
 from tkinter import *
 from tkinter import colorchooser
+from tkinter import filedialog
 
 
-class Settings():
+class Settings:
     def __init__(self, language, main_class):
         self.main = main_class
         self.root = Toplevel(main_class.root)
-        self.save_btn = None
+
+        self.choose_color_button = None
+        self.open_file_button = None
+        self.save_button = None
 
         self.last_language = language
         self.languages = ('Русский', 'English')
         self.language_selected = StringVar(self.root)
         self.language_selected.set(language)
 
-        self.label = Label(text=self.language_selected.get())
+        self.label = Label(text=f"Текущий язык: {self.language_selected.get()}")
         self.label.pack(side=BOTTOM)
         self.setup_master()
         self.create_widgets()
@@ -30,16 +34,36 @@ class Settings():
         )
 
         option_menu.grid(column=1, row=0, sticky=W, **paddings)
-        self.save_btn = Button(self.root, text="Сохранить", command=self.save_closing)
-        self.save_btn.place(x=330, y=140)
+
+        self.save_button = Button(self.root, text="Сохранить", command=self.save_closing)
+        self.save_button.place(x=330, y=140)
         self.switch_music = Button(self.root, text="Звук", command=self.main.off_music)
         self.switch_music.place(x=200, y=100)
 
-        self.btn = Button(self.root, text="Выберите цвет", command=self.onChoose)
-        self.btn.place(x=10, y=140)
+        self.choose_color_button = Button(self.root, text="Выберите цвет", command=self.onChoose)
+        self.choose_color_button.place(x=10, y=140)
+
+        self.open_file_button = Button(self.root, text="Выбрать файл", command=self.choose_file)
+        self.open_file_button.place(x=140, y=140)
 
     def onChoose(self):
         self.main.bg = colorchooser.askcolor()[1]
+
+    def choose_file(self):
+        filetypes = (
+            ('text files', '*.txt'),
+        )
+
+        filename = filedialog.askopenfilename(
+            title='Выберите файл',
+            initialdir='/',
+            filetypes=filetypes
+        )
+
+        if filename == '':
+            self.main.restart()
+        else:
+            self.main.restart(filename)
 
     def setup_master(self):
         self.root.title("Настройки")
@@ -50,7 +74,7 @@ class Settings():
 
     def update_language_label(self):
         self.label.pack(side=BOTTOM)
-        self.label.config(text=self.language_selected.get())
+        self.label.config(text=f"Текущий язык: {self.language_selected.get()}")
 
     def save_closing(self):
         self.on_closing(save=True)
