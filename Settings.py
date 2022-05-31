@@ -2,23 +2,25 @@ from tkinter import *
 from tkinter import colorchooser
 from tkinter import filedialog
 
+from App import CurrentSettings
+
 
 class Settings:
-    def __init__(self, language, main_class):
+    def __init__(self, main_class, current_settings: CurrentSettings):
         self.main = main_class
+        self.CURRENT_SETTINGS = current_settings
         self.root = Toplevel(main_class.root)
 
         self.choose_color_button = None
         self.open_file_button = None
         self.save_button = None
 
-        self.last_language = language
-        self.languages = ('Русский', 'English')
-        self.language_selected = StringVar(self.root)
-        self.language_selected.set(language)
+        self.current_language = current_settings.language
+        self.chosen_color = current_settings.bg
 
-        self.label = Label(text=f"Текущий язык: {self.language_selected.get()}")
-        self.label.pack(side=BOTTOM)
+        self.language_selected = StringVar(self.root)
+        self.language_selected.set(current_settings.language)
+
         self.setup_master()
         self.create_widgets()
 
@@ -30,7 +32,7 @@ class Settings:
         option_menu = OptionMenu(
             self.root,
             self.language_selected,
-            *self.languages
+            *self.CURRENT_SETTINGS.available_languages
         )
 
         option_menu.grid(column=1, row=0, sticky=W, **paddings)
@@ -40,14 +42,14 @@ class Settings:
         self.switch_music = Button(self.root, text="Звук", command=self.main.off_music)
         self.switch_music.place(x=200, y=100)
 
-        self.choose_color_button = Button(self.root, text="Выберите цвет", command=self.onChoose)
+        self.choose_color_button = Button(self.root, text="Выберите цвет", command=self.on_color_chosen)
         self.choose_color_button.place(x=10, y=140)
 
         self.open_file_button = Button(self.root, text="Выбрать файл", command=self.choose_file)
         self.open_file_button.place(x=140, y=140)
 
-    def onChoose(self):
-        self.main.bg = colorchooser.askcolor()[1]
+    def on_color_chosen(self):
+        self.chosen_color = colorchooser.askcolor()[1]
 
     def choose_file(self):
         filetypes = (
@@ -72,27 +74,27 @@ class Settings:
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.root.withdraw()
 
-    def update_language_label(self):
-        self.label.pack(side=BOTTOM)
-        self.label.config(text=f"Текущий язык: {self.language_selected.get()}")
-
     def save_closing(self):
         self.on_closing(save=True)
 
     def on_closing(self, save=False):
         if save:
-            self.main.root['bg'] = self.main.bg
-            if self.last_language != self.language_selected.get():
-                self.main.restart()
-            else:
+            self.CURRENT_SETTINGS.bg = self.chosen_color
+            self.main.set_bg()
+
+            if self.current_language == self.language_selected.get():
                 self.root.withdraw()
-                self.update_language_label()
+            else:
+                self.CURRENT_SETTINGS.language = self.language_selected.get()
+                self.main.restart()
         else:
-            self.language_selected.set(self.last_language)
+            self.chosen_color = self.CURRENT_SETTINGS.bg
+            self.language_selected.set(self.current_language)
+
             self.root.withdraw()
+
         self.root.grab_release()
 
     def run(self):
-        self.last_language = self.language_selected.get()
         self.root.deiconify()
         self.root.grab_set()

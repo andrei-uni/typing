@@ -14,59 +14,72 @@ import Records as rec
 from RecordType import RecordType
 
 
+class CurrentSettings:
+    language = "Русский"
+    bg = "#54c6ff"
+
+    available_languages = ('Русский', 'English')
+
+
+CURRENT_SETTINGS = CurrentSettings()
+
+
 class Application:
-    def __init__(self, custom_file='', language='Русский', bg="#54c6ff"):
+    def __init__(self, custom_file=''):
         self.root = Tk()
-        self.root.focus_force()
-        self.bg = bg
+        self.setup_root()
+
+
         self.cur_index = 0
         self.filename = None
-
-        self.main_label = Text(self.root, font=("Consolas", 14), bg="white", fg='#2a2a2a', insertontime=0)
 
         self.off_button = None
         self.settings_button = None
         self.restart_btn = None
         self.records_button = None
 
-        self.settings = st.Settings(language, self)
+        self.settings = st.Settings(self, CURRENT_SETTINGS)
         self.records = rec.Records(self)
         self.speed_stat = sp.Statistics()
         self.accuracy_stat = ac.Statistic(self)
 
         if custom_file == '':
-            self.text = self.open_preset_file(self.settings.language_selected.get())
+            self.text = self.open_preset_file(CURRENT_SETTINGS.language)
         else:
             self.text = self.open_custom_file(custom_file)
 
+        self.text_widget = Text(self.root, font=("Consolas", 14), bg="white", fg='#2a2a2a', insertontime=0)
+        self.setup_text_widget()
+
         self.text_len = len(self.text)
 
-        self.setup_root()
-        self.setup_frame()
         self.add_buttons()
         self.play_music()
 
+        self.current_language_label = Label(text=f"Текущий язык: {CURRENT_SETTINGS.language}")
+        self.current_language_label.pack(side=BOTTOM)
+
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
-        self.root["bg"] = self.bg
+        self.set_bg()
         self.root.focus_force()
         self.root.title("Клавиатурный тренажер")
         self.root.bind("<Key>", self.key_pressed)
 
-    def setup_frame(self):
-        self.main_label.insert(INSERT, self.text)
-        self.main_label.tag_config("current", background="green", foreground="white")
-        self.main_label.tag_config("previous", background="white", foreground="green")
-        self.main_label.tag_config("wrong", foreground="red")
-        self.main_label.config(state=DISABLED)
-        self.main_label.pack(ipadx=10, ipady=10)
+    def setup_text_widget(self):
+        self.text_widget.insert(INSERT, self.text)
+        self.text_widget.tag_config("current", background="green", foreground="white")
+        self.text_widget.tag_config("previous", background="white", foreground="green")
+        self.text_widget.tag_config("wrong", foreground="red")
+        self.text_widget.config(state=DISABLED)
+        self.text_widget.pack(ipadx=10, ipady=10)
         self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
 
         self.accuracy_stat.add_statistic_in_app(LEFT)
         self.speed_stat.add_statistic_in_app(RIGHT)
 
     def add_highlight_for_symbol(self, name, first, second):
-        self.main_label.tag_add(name, f"1.{first}", f"1.{second}")
+        self.text_widget.tag_add(name, f"1.{first}", f"1.{second}")
 
     def add_record(self):
         self.records.add_new_record(RecordType(f'{int(time.perf_counter() - self.speed_stat.start_time)} сек.',
@@ -80,6 +93,7 @@ class Application:
     def key_pressed(self, event):
         if event.char == "" or self.cur_index == self.text_len:
             return
+
         if self.cur_index == 0:
             self.speed_stat.start_timer()
 
@@ -96,8 +110,10 @@ class Application:
             if not self.accuracy_stat.mistook_letter:
                 self.accuracy_stat.mistook_letter = True
             self.add_highlight_for_symbol("wrong", self.cur_index, self.cur_index + 1)
+
         if self.cur_index == self.text_len:
             self.add_record()
+
         self.accuracy_stat.update_statistic()
 
     def open_preset_file(self, lang):
@@ -108,8 +124,7 @@ class Application:
         else:
             raise Exception("Incorrect Language")
 
-        texts_dir = Path("Texts", sel_lang)
-        files = [i for i in texts_dir.iterdir()]
+        files = [i for i in Path("Texts", sel_lang).iterdir()]
         self.filename = random.choice(files)
 
         return self.open_file(self.filename)
@@ -142,16 +157,17 @@ class Application:
     def next_track(self):
         pygame.mixer.music.play()
 
+    def set_bg(self):
+        self.root["bg"] = CURRENT_SETTINGS.bg
+
     def close(self):
         self.settings.root.destroy()
         self.records.root.destroy()
         self.root.destroy()
 
     def restart(self, custom_file=''):
-        bg = self.root['bg']
-        language = self.settings.language_selected.get()
         self.close()
-        Application(custom_file, language, bg).run()
+        Application(custom_file).run()
 
     def add_buttons(self):
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
@@ -175,5 +191,4 @@ if __name__ == "__main__":
         from ctypes import windll
         windll.shcore.SetProcessDpiAwareness(1)
 
-    app = Application()
-    app.run()
+    Application().run()
