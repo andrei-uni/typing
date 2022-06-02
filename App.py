@@ -148,11 +148,11 @@ class Application:
 
     def on_music(self):
         pygame.mixer.music.unpause()
-        self.settings.switch_music['command'] = self.off_music
+        self.settings.switch_music_button['command'] = self.off_music
 
     def off_music(self):
-        self.settings.switch_music['command'] = self.on_music
         pygame.mixer.music.pause()
+        self.settings.switch_music_button['command'] = self.on_music
 
     def next_track(self):
         pygame.mixer.music.play()

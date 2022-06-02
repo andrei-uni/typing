@@ -11,6 +11,7 @@ class Settings:
         self.CURRENT_SETTINGS = current_settings
         self.root = Toplevel(main_class.root)
 
+        self.switch_music_button = None
         self.choose_color_button = None
         self.open_file_button = None
         self.save_button = None
@@ -39,8 +40,9 @@ class Settings:
 
         self.save_button = Button(self.root, text="Сохранить", command=self.save_closing)
         self.save_button.place(x=330, y=140)
-        self.switch_music = Button(self.root, text="Звук", command=self.main.off_music)
-        self.switch_music.place(x=200, y=100)
+
+        self.switch_music_button = Button(self.root, text="Звук", command=self.main.off_music)
+        self.switch_music_button.place(x=200, y=100)
 
         self.choose_color_button = Button(self.root, text="Выберите цвет", command=self.on_color_chosen)
         self.choose_color_button.place(x=10, y=140)
