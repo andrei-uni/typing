@@ -18,7 +18,7 @@ class Statistics:
 
     def add_statistic_in_app(self, side):
         self.label = Label(text=self.get_speed_rate_text_template(), width=10, height=10)
-        self.label.pack(side=side)
+        self.label.place(x=1815, y=700)
 
     def update_statistic(self):
         self.cur_index += 1

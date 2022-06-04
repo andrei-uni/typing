@@ -39,14 +39,14 @@ class Settings:
 
         self.save_button = Button(self.root, text="Сохранить", command=self.save_closing)
         self.save_button.place(x=330, y=140)
-        self.switch_music = Button(self.root, text="Звук", command=self.main.off_music)
-        self.switch_music.place(x=200, y=100)
+        self.switch_music = Button(self.root, text="Выключить звук", command=self.main.off_music)
+        self.switch_music.place(x=10, y=70)
 
         self.choose_color_button = Button(self.root, text="Выберите цвет", command=self.on_color_chosen)
         self.choose_color_button.place(x=10, y=140)
 
         self.open_file_button = Button(self.root, text="Выбрать файл", command=self.choose_file)
-        self.open_file_button.place(x=140, y=140)
+        self.open_file_button.place(x=160, y=140)
 
     def on_color_chosen(self):
         self.chosen_color = colorchooser.askcolor()[1]
