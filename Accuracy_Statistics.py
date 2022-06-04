@@ -14,7 +14,7 @@ class Statistic:
 
     def add_statistic_in_app(self, side):
         self.label = Label(text=self.get_accuracy_text_template(), width=10, height=10)
-        self.label.pack(side=side)
+        self.label.place(x=0, y=700)
 
     def update_statistic(self):
         self.percent = self.calculate_correctness_percent()

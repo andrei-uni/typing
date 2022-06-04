@@ -29,7 +29,6 @@ class Application:
         self.root = Tk()
         self.setup_root()
 
-
         self.cur_index = 0
         self.filename = None
 
@@ -54,15 +53,14 @@ class Application:
         self.text_len = len(self.text)
 
         self.add_buttons()
-        self.play_music()
 
         self.current_language_label = Label(text=f"Текущий язык: {CURRENT_SETTINGS.language}")
         self.current_language_label.pack(side=BOTTOM)
+        self.root.focus_force()
 
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
         self.set_bg()
-        self.root.focus_force()
         self.root.title("Клавиатурный тренажер")
         self.root.bind("<Key>", self.key_pressed)
 
@@ -137,25 +135,15 @@ class Application:
         with file.open(encoding="utf-8") as f:
             return f.read().strip()
 
-    def play_music(self):
-        pygame.init()
-        music_dir = Path("Music")
-        tracks = [i for i in music_dir.iterdir()]
-        pygame.mixer.music.load(random.choice(tracks))
-        for music in tracks:
-            pygame.mixer.music.queue(music)
-        pygame.mixer.music.play()
-
     def on_music(self):
         pygame.mixer.music.unpause()
-        self.settings.switch_music_button['command'] = self.off_music
+        self.settings.switch_music['command'] = self.off_music
+        self.settings.switch_music['text'] = 'Выключить музыку'
 
     def off_music(self):
+        self.settings.switch_music['command'] = self.on_music
+        self.settings.switch_music['text'] = 'Включить музыку'
         pygame.mixer.music.pause()
-        self.settings.switch_music_button['command'] = self.on_music
-
-    def next_track(self):
-        pygame.mixer.music.play()
 
     def set_bg(self):
         self.root["bg"] = CURRENT_SETTINGS.bg
@@ -171,24 +159,34 @@ class Application:
 
     def add_buttons(self):
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
-        self.off_button.pack(side=BOTTOM)
+        self.off_button.place(x=910, y=1000)
 
         self.settings_button = Button(self.root, text="Настройки", command=self.settings.run)
-        self.settings_button.pack(pady=10)
+        self.settings_button.place(x=890, y=820)
 
         self.records_button = Button(self.root, text="Рекорды", command=self.records.run)
-        self.records_button.pack(pady=10)
+        self.records_button.place(x=795, y=820)
 
         self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)
-        self.restart_btn.pack()
+        self.restart_btn.place(x=1000, y=820)
 
     def run(self):
         self.root.mainloop()
+
+
+def add_music():
+    pygame.init()
+    music_dir = Path("Music")
+    tracks = [i for i in music_dir.iterdir()]
+    pygame.mixer.music.load(random.choice(tracks))
+    for music in tracks:
+        pygame.mixer.music.queue(music)
+    pygame.mixer.music.play()
 
 
 if __name__ == "__main__":
     if platform.system() == "Windows":
         from ctypes import windll
         windll.shcore.SetProcessDpiAwareness(1)
-
+    add_music()
     Application().run()
