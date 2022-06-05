@@ -7,16 +7,14 @@ import pygame
 from tkinter import *
 from pathlib import Path
 
-import Accuracy_Statistics as ac
-import Speed_Statistics as sp
-import Settings as st
-import Records as rec
-from RecordType import RecordType
+from Modules import Records as rec, Settings as st, Speed_Statistics as sp, Accuracy_Statistics as ac
+import Modules.RecordType
 
 
 class CurrentSettings:
     language = "Русский"
     bg = "#54c6ff"
+    music = True
 
     available_languages = ('Русский', 'English')
 
@@ -80,13 +78,14 @@ class Application:
         self.text_widget.tag_add(name, f"1.{first}", f"1.{second}")
 
     def add_record(self):
-        self.records.add_new_record(RecordType(f'{int(time.perf_counter() - self.speed_stat.start_time)} сек.',
-                                               self.speed_stat.rate,
-                                               self.accuracy_stat.percent,
-                                               datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S'),
-                                               self.filename
-                                               )
-                                    )
+        self.records.add_new_record(
+            Modules.RecordType.RecordType(f'{int(time.perf_counter() - self.speed_stat.start_time)} сек.',
+                                          self.speed_stat.rate,
+                                          self.accuracy_stat.percent,
+                                          datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S'),
+                                          self.filename
+                                          )
+            )
 
     def key_pressed(self, event):
         if event.char == "" or self.cur_index == self.text_len:
@@ -138,10 +137,12 @@ class Application:
     def on_music(self):
         pygame.mixer.music.unpause()
         self.settings.switch_music['command'] = self.off_music
+        CURRENT_SETTINGS.music = True
         self.settings.switch_music['text'] = 'Выключить музыку'
 
     def off_music(self):
         self.settings.switch_music['command'] = self.on_music
+        CURRENT_SETTINGS.music = False
         self.settings.switch_music['text'] = 'Включить музыку'
         pygame.mixer.music.pause()
 
@@ -187,6 +188,7 @@ def add_music():
 if __name__ == "__main__":
     if platform.system() == "Windows":
         from ctypes import windll
+
         windll.shcore.SetProcessDpiAwareness(1)
     add_music()
     Application().run()
