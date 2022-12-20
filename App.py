@@ -35,6 +35,10 @@ class Application:
         self.restart_btn = None
         self.records_button = None
 
+        self.limited_time_mode_btn = None
+        self.timer_label = None
+        self.remaining_time = 0
+
         self.settings = st.Settings(self, CURRENT_SETTINGS)
         self.records = rec.Records(self)
         self.speed_stat = sp.Statistics()
@@ -45,7 +49,8 @@ class Application:
         else:
             self.text = self.open_custom_file(custom_file)
 
-        self.text_widget = Text(self.root, font=("Consolas", 14), bg="white", fg='#2a2a2a', insertontime=0)
+        self.text_widget = None
+        self.set_text_widget()
         self.setup_text_widget()
 
         self.text_len = len(self.text)
@@ -55,6 +60,9 @@ class Application:
         self.current_language_label = Label(text=f"Текущий язык: {CURRENT_SETTINGS.language}")
         self.current_language_label.pack(side=BOTTOM)
         self.root.focus_force()
+
+    def set_text_widget(self):
+        self.text_widget = Text(self.root, font=("Consolas", 14), bg="white", fg='#2a2a2a', insertontime=0)
 
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
@@ -170,6 +178,34 @@ class Application:
 
         self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)
         self.restart_btn.place(x=1000, y=820)
+
+        self.limited_time_mode_btn = Button(self.root, text="На время", command=self.limited_time_mode)
+        self.limited_time_mode_btn.place(x=1150, y=820)
+
+    def limited_time_mode(self):
+        self.timer_label = Label(text="", bg=CURRENT_SETTINGS.bg, font=("Times", 30))
+        self.timer_label.place(x=self.root.winfo_screenwidth() / 2, y=self.root.winfo_screenheight() * 0.6)
+
+        self.text = self.open_custom_file("Texts/long.txt")
+        self.text_len = len(self.text)
+        self.cur_index = 0
+        self.text_widget.place_forget()
+        self.set_text_widget()
+        self.setup_text_widget()
+
+        self.countdown(61)
+
+    def countdown(self, remaining=None):
+        if remaining is not None:
+            self.remaining_time = remaining
+
+        if self.remaining_time <= 0:
+            self.timer_label.configure(text="Время вышло!")
+            # TODO add messagebox with score
+        else:
+            self.timer_label.configure(text="%d" % self.remaining_time)
+            self.remaining_time = self.remaining_time - 1
+            self.root.after(1000, self.countdown)
 
     def run(self):
         self.root.mainloop()
