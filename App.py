@@ -50,7 +50,7 @@ class Application:
         elif custom_file == 'Texts/long.txt':
             self.text = self.open_custom_file(custom_file)
             self.timer_label = Label(text="", bg=CURRENT_SETTINGS.bg, font=("Times", 30))
-            self.timer_label.place(x=self.root.winfo_screenwidth() / 2, y=self.root.winfo_screenheight() * 0.7)
+            self.timer_label.place(x=self.root.winfo_screenwidth() / 2 - 25, y=self.root.winfo_screenheight() * 0.9)
             self.countdown(61)
         else:
             self.text = self.open_custom_file(custom_file)

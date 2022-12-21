@@ -4,7 +4,7 @@ from tkinter import ttk
 import Modules.RecordType
 
 
-class Records():
+class Records:
     FILENAME = '../records.txt'
 
     def __init__(self, main_class):
