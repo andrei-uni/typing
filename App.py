@@ -5,6 +5,7 @@ import platform
 import pygame
 
 from tkinter import *
+from tkinter import messagebox
 from pathlib import Path
 
 from Modules import Records as rec, Settings as st, Speed_Statistics as sp, Accuracy_Statistics as ac
@@ -46,6 +47,11 @@ class Application:
 
         if custom_file == '':
             self.text = self.open_preset_file(CURRENT_SETTINGS.language)
+        elif custom_file == 'Texts/long.txt':
+            self.text = self.open_custom_file(custom_file)
+            self.timer_label = Label(text="", bg=CURRENT_SETTINGS.bg, font=("Times", 30))
+            self.timer_label.place(x=self.root.winfo_screenwidth() / 2, y=self.root.winfo_screenheight() * 0.7)
+            self.countdown(61)
         else:
             self.text = self.open_custom_file(custom_file)
 
@@ -183,17 +189,7 @@ class Application:
         self.limited_time_mode_btn.place(x=1150, y=820)
 
     def limited_time_mode(self):
-        self.timer_label = Label(text="", bg=CURRENT_SETTINGS.bg, font=("Times", 30))
-        self.timer_label.place(x=self.root.winfo_screenwidth() / 2, y=self.root.winfo_screenheight() * 0.6)
-
-        self.text = self.open_custom_file("Texts/long.txt")
-        self.text_len = len(self.text)
-        self.cur_index = 0
-        self.text_widget.place_forget()
-        self.set_text_widget()
-        self.setup_text_widget()
-
-        self.countdown(61)
+        self.restart("Texts/long.txt")
 
     def countdown(self, remaining=None):
         if remaining is not None:
@@ -201,7 +197,8 @@ class Application:
 
         if self.remaining_time <= 0:
             self.timer_label.configure(text="Время вышло!")
-            # TODO add messagebox with score
+            messagebox.showinfo("Время вышло", f"Вы набрали {self.cur_index} очков")
+            self.restart()
         else:
             self.timer_label.configure(text="%d" % self.remaining_time)
             self.remaining_time = self.remaining_time - 1
