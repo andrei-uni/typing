@@ -52,7 +52,7 @@ class Application:
             self.text = self.open_custom_file(custom_file)
             self.timer_label = Label(text="", bg=CURRENT_SETTINGS.bg, font=("Times", 30))
             self.timer_label.place(x=self.root.winfo_screenwidth() * 0.96, y=0)
-            self.countdown(60)
+            self.countdown(20)
         else:
             self.text = self.open_custom_file(custom_file)
 
@@ -200,6 +200,7 @@ class Application:
 
         if self.remaining_time <= 0:
             self.timer_label.configure(text="Время вышло!")
+            self.timer_label.place(x=self.root.winfo_screenwidth() * 0.875 / 2, y = self.root.winfo_screenheight() * 0.8)
             messagebox.showinfo("Время вышло", f"Вы набрали {self.cur_index} очков")
             self.restart()
         else:
