@@ -173,20 +173,22 @@ class Application:
         Application(custom_file).run()
 
     def add_buttons(self):
-        self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
-        self.off_button.place(x=910, y=1000)
+        height = self.root.winfo_screenheight()
 
         self.settings_button = Button(self.root, text="Настройки", command=self.settings.run)
-        self.settings_button.place(x=890, y=820)
+        self.settings_button.place(x=0, y=0)
 
         self.records_button = Button(self.root, text="Рекорды", command=self.records.run)
-        self.records_button.place(x=795, y=820)
+        self.records_button.place(x=0, y=50)
 
         self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)
-        self.restart_btn.place(x=1000, y=820)
+        self.restart_btn.place(x=0, y=100)
 
         self.limited_time_mode_btn = Button(self.root, text="На время", command=self.limited_time_mode)
-        self.limited_time_mode_btn.place(x=1150, y=820)
+        self.limited_time_mode_btn.place(x=0, y=150)
+
+        self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
+        self.off_button.place(x=0, y=200)
 
     def limited_time_mode(self):
         self.restart("Texts/long.txt")
