@@ -48,9 +48,10 @@ class Application:
         if custom_file == '':
             self.text = self.open_preset_file(CURRENT_SETTINGS.language)
         elif custom_file == 'Texts/long.txt':
+            CURRENT_SETTINGS.language = 'Русский'
             self.text = self.open_custom_file(custom_file)
             self.timer_label = Label(text="", bg=CURRENT_SETTINGS.bg, font=("Times", 30))
-            self.timer_label.place(x=self.root.winfo_screenwidth() / 2 - 25, y=self.root.winfo_screenheight() * 0.9)
+            self.timer_label.place(x=self.root.winfo_screenwidth() / 2, y=self.root.winfo_screenheight() * 0.7)
             self.countdown(61)
         else:
             self.text = self.open_custom_file(custom_file)
