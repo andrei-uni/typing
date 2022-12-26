@@ -2,8 +2,8 @@ import random
 import time
 import unittest
 from Modules.Accuracy_Statistics import AccuracyStatistic
+from Modules.FileVerifier import FileVerifier
 from Modules.Speed_Statistics import SpeedStatistics
-from App import Application
 
 
 class TestAccuracy(unittest.TestCase):
@@ -93,7 +93,7 @@ class TestTextReplacement(unittest.TestCase):
     def test_empty_text(self):
         text = ""
 
-        result = Application.replace_not_keyboard_symbols(text)
+        result = FileVerifier.replace_not_keyboard_symbols(text)
 
         self.assertEqual(result, "")
 

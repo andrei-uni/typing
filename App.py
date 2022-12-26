@@ -11,31 +11,8 @@ from pathlib import Path
 
 from Modules import Records as rec, Settings as st, Speed_Statistics as sp, Accuracy_Statistics as ac
 import Modules.RecordType
-
-
-class SystemConstants:
-    REPEAT_REGEX = re.compile(r"((\w)\2{4,})")
-    REPLACEMENTS = {"—": "-",
-                    "–": "-",
-                    "‒": "-",
-                    "―": "-",
-                    "Ⅰ": "I",
-                    "Ⅱ": "II",
-                    "Ⅲ": "III",
-                    "Ⅳ": "IV",
-                    "Ⅴ": "V",
-                    "Ⅵ": "VI",
-                    "Ⅶ": "VII",
-                    "Ⅷ": "VIII",
-                    "Ⅸ": "IX",
-                    "Ⅹ": "X",
-                    "Ⅺ": "XI",
-                    "Ⅻ": "XII",
-                    "Ⅼ": "L",
-                    "Ⅽ": "C",
-                    "Ⅾ": "D",
-                    "Ⅿ": "M",
-                    }
+from Modules.FileVerifier import FileVerifier
+from Modules.SystemConstants import SystemConstants
 
 
 class CurrentSettings:
@@ -192,7 +169,7 @@ class Application:
                 messagebox.showinfo("Текст недоступен",
                                     f"В вашем тексте символ {repeats[0][0][0]} повторяется более 3 раз подряд")
                 return self.open_preset_file(CURRENT_SETTINGS.language)
-            return self.replace_not_keyboard_symbols(text)
+            return FileVerifier.replace_not_keyboard_symbols(text)
 
     def on_music(self):
         pygame.mixer.music.unpause()
@@ -287,16 +264,6 @@ class Application:
 
     def run(self):
         self.root.mainloop()
-
-    @staticmethod
-    def replace_not_keyboard_symbols(text):
-        new_text = ""
-        for index in range(len(text)):
-            if text[index] in SystemConstants.REPLACEMENTS.keys():
-                new_text += SystemConstants.REPLACEMENTS[text[index]]
-            else:
-                new_text += text[index]
-        return new_text
 
     @staticmethod
     def add_music():
