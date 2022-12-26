@@ -107,7 +107,7 @@ class Application:
             self.text = self.open_custom_file(custom_file)
             self.timer_label = Label(text="", bg=CURRENT_SETTINGS.bg, font=("Times", 30))
             self.timer_label.place(x=self.root.winfo_screenwidth() * 0.96, y=0)
-            self.countdown(20)
+            self.countdown(60)
         else:
             self.text = self.open_custom_file(custom_file)
 
