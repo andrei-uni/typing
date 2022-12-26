@@ -1,8 +1,9 @@
+import math
 import time
 from tkinter import *
 
 
-class Statistics:
+class SpeedStatistics:
 
     def __init__(self):
         self.cur_index = 0
@@ -14,19 +15,21 @@ class Statistics:
         return f"Скорость:\n {self.rate} зн./мин"
 
     def start_timer(self):
+        self.cur_index = 0
         self.start_time = time.perf_counter()
 
-    def add_statistic_in_app(self, side):
+    def add_statistic_in_app(self):
         self.label = Label(text=self.get_speed_rate_text_template(), width=10, height=10)
         self.label.place(x=1815, y=700)
 
     def update_statistic(self):
         self.cur_index += 1
-        self.rate = self.calculate_speed()
+        self.rate = self.calculate_speed(self.cur_index, self.start_time)
         self.label.config(text=self.get_speed_rate_text_template())
 
-    def calculate_speed(self):
-        return int(self.cur_index / (time.perf_counter() - self.start_time) * 60)
+    @staticmethod
+    def calculate_speed(cur_index, start_time):
+        return math.ceil(cur_index / (time.perf_counter() - start_time) * 60)
 
 
 

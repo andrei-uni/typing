@@ -3,6 +3,7 @@ import datetime
 import time
 import platform
 import pygame
+import re
 
 from tkinter import *
 from tkinter import messagebox
@@ -10,6 +11,31 @@ from pathlib import Path
 
 from Modules import Records as rec, Settings as st, Speed_Statistics as sp, Accuracy_Statistics as ac
 import Modules.RecordType
+
+
+class SystemConstants:
+    REPEAT_REGEX = re.compile(r"((\w)\2{4,})")
+    REPLACEMENTS = {"—": "-",
+                    "–": "-",
+                    "‒": "-",
+                    "―": "-",
+                    "Ⅰ": "I",
+                    "Ⅱ": "II",
+                    "Ⅲ": "III",
+                    "Ⅳ": "IV",
+                    "Ⅴ": "V",
+                    "Ⅵ": "VI",
+                    "Ⅶ": "VII",
+                    "Ⅷ": "VIII",
+                    "Ⅸ": "IX",
+                    "Ⅹ": "X",
+                    "Ⅺ": "XI",
+                    "Ⅻ": "XII",
+                    "Ⅼ": "L",
+                    "Ⅽ": "C",
+                    "Ⅾ": "D",
+                    "Ⅿ": "M",
+                    }
 
 
 class CurrentSettings:
@@ -25,11 +51,14 @@ CURRENT_SETTINGS = CurrentSettings()
 
 class Application:
     def __init__(self, custom_file=''):
+        self.text = None
         self.root = Tk()
         self.setup_root()
+        self.after_id = None
 
         self.cur_index = 0
         self.filename = None
+        self.game_mode = "Обычный"
 
         self.off_button = None
         self.settings_button = None
@@ -42,11 +71,37 @@ class Application:
 
         self.settings = st.Settings(self, CURRENT_SETTINGS)
         self.records = rec.Records(self)
-        self.speed_stat = sp.Statistics()
-        self.accuracy_stat = ac.Statistic(self)
+        self.speed_stat = sp.SpeedStatistics()
+        self.accuracy_stat = ac.AccuracyStatistic(self)
+        self.text_widget = None
 
+        self.current_language_label = Label(text=f"Текущий язык: {CURRENT_SETTINGS.language}")
+        self.current_language_label.pack(side=BOTTOM)
+
+        self.accuracy_stat.add_statistic_in_app()
+        self.speed_stat.add_statistic_in_app()
+        self.add_buttons()
+
+        self.text_widget = Text(self.root,
+                                font=("Consolas", 14),
+                                bg="white",
+                                fg='#2a2a2a',
+                                insertontime=0)
+
+        self.text_widget.pack(ipadx=10,
+                              ipady=10)
+
+        self.select_text(custom_file)
+
+        self.text_len = len(self.text)
+        self.setup_text_widget()
+
+        self.root.focus_force()
+
+    def select_text(self, custom_file=''):
         if custom_file == '':
             self.text = self.open_preset_file(CURRENT_SETTINGS.language)
+
         elif custom_file == 'Texts/long.txt':
             CURRENT_SETTINGS.language = 'Русский'
             self.text = self.open_custom_file(custom_file)
@@ -55,21 +110,6 @@ class Application:
             self.countdown(20)
         else:
             self.text = self.open_custom_file(custom_file)
-
-        self.text_widget = None
-        self.set_text_widget()
-        self.setup_text_widget()
-
-        self.text_len = len(self.text)
-
-        self.add_buttons()
-
-        self.current_language_label = Label(text=f"Текущий язык: {CURRENT_SETTINGS.language}")
-        self.current_language_label.pack(side=BOTTOM)
-        self.root.focus_force()
-
-    def set_text_widget(self):
-        self.text_widget = Text(self.root, font=("Consolas", 14), bg="white", fg='#2a2a2a', insertontime=0)
 
     def setup_root(self):
         self.root.attributes('-fullscreen', True)
@@ -83,11 +123,7 @@ class Application:
         self.text_widget.tag_config("previous", background="white", foreground="green")
         self.text_widget.tag_config("wrong", foreground="red")
         self.text_widget.config(state=DISABLED)
-        self.text_widget.pack(ipadx=10, ipady=10)
         self.add_highlight_for_symbol("current", self.cur_index, self.cur_index + 1)
-
-        self.accuracy_stat.add_statistic_in_app(LEFT)
-        self.speed_stat.add_statistic_in_app(RIGHT)
 
     def add_highlight_for_symbol(self, name, first, second):
         self.text_widget.tag_add(name, f"1.{first}", f"1.{second}")
@@ -100,7 +136,7 @@ class Application:
                                           datetime.datetime.today().strftime('%d.%m.%y %H:%M:%S'),
                                           self.filename
                                           )
-            )
+        )
 
     def key_pressed(self, event):
         if event.char == "" or self.cur_index == self.text_len:
@@ -147,7 +183,16 @@ class Application:
 
     def open_file(self, file: Path):
         with file.open(encoding="utf-8") as f:
-            return f.read().strip()
+            text = f.read().strip()
+            repeats = re.findall(SystemConstants.REPEAT_REGEX, text)
+            if len(text) < 100:
+                messagebox.showinfo("Текст недоступен", f"Вы выбрали текст, короче 100 символов ({len(text)})")
+                return self.open_preset_file(CURRENT_SETTINGS.language)
+            if len(repeats) > 0:
+                messagebox.showinfo("Текст недоступен",
+                                    f"В вашем тексте символ {repeats[0][0][0]} повторяется более 3 раз подряд")
+                return self.open_preset_file(CURRENT_SETTINGS.language)
+            return self.replace_not_keyboard_symbols(text)
 
     def on_music(self):
         pygame.mixer.music.unpause()
@@ -165,16 +210,51 @@ class Application:
         self.root["bg"] = CURRENT_SETTINGS.bg
 
     def close(self):
-        self.settings.root.destroy()
-        self.records.root.destroy()
         self.root.destroy()
 
     def restart(self, custom_file=''):
-        self.close()
-        Application(custom_file).run()
+        if self.game_mode == "На время":
+            custom_file = "Texts/long.txt"
+            if self.timer_label is not None:
+                self.timer_label.destroy()
+            if self.after_id is not None:
+                self.root.after_cancel(self.after_id)
+                self.after_id = None
+
+        self.text_widget.destroy()
+
+        self.cur_index = 0
+
+        self.speed_stat = sp.SpeedStatistics()
+        self.accuracy_stat = ac.AccuracyStatistic(self)
+
+        self.accuracy_stat.add_statistic_in_app()
+        self.speed_stat.add_statistic_in_app()
+
+        self.text_widget = Text(self.root,
+                                font=("Consolas", 14),
+                                bg="white",
+                                fg='#2a2a2a',
+                                insertontime=0)
+
+        self.text_widget.pack(ipadx=10,
+                              ipady=10)
+
+        self.select_text(custom_file)
+        self.setup_text_widget()
+
+    def switch_game_mode(self):
+        if self.game_mode == "Обычный":
+            self.limited_time_mode_btn['text'] = "Обычный режим"
+            self.game_mode = "На время"
+            self.restart("Texts/long.txt")
+        else:
+            self.limited_time_mode_btn['text'] = "На время"
+            self.game_mode = "Обычный"
+            self.timer_label.destroy()
+            self.restart("")
 
     def add_buttons(self):
-        height = self.root.winfo_screenheight()
 
         self.settings_button = Button(self.root, text="Настройки", command=self.settings.run)
         self.settings_button.place(x=0, y=0)
@@ -185,14 +265,11 @@ class Application:
         self.restart_btn = Button(self.root, text="Перезапустить", command=self.restart)
         self.restart_btn.place(x=0, y=100)
 
-        self.limited_time_mode_btn = Button(self.root, text="На время", command=self.limited_time_mode)
+        self.limited_time_mode_btn = Button(self.root, text="На время", command=self.switch_game_mode)
         self.limited_time_mode_btn.place(x=0, y=150)
 
         self.off_button = Button(self.root, text="Выключить", bg="grey", fg="white", command=self.close)
         self.off_button.place(x=0, y=200)
-
-    def limited_time_mode(self):
-        self.restart("Texts/long.txt")
 
     def countdown(self, remaining=None):
         if remaining is not None:
@@ -200,26 +277,39 @@ class Application:
 
         if self.remaining_time <= 0:
             self.timer_label.configure(text="Время вышло!")
-            self.timer_label.place(x=self.root.winfo_screenwidth() * 0.875 / 2, y = self.root.winfo_screenheight() * 0.8)
+            self.timer_label.place(x=self.root.winfo_screenwidth() * 0.875 / 2, y=self.root.winfo_screenheight() * 0.8)
             messagebox.showinfo("Время вышло", f"Вы набрали {self.cur_index} очков")
-            self.restart()
+            self.restart("Texts/long.txt")
         else:
             self.timer_label.configure(text="%d" % self.remaining_time)
             self.remaining_time = self.remaining_time - 1
-            self.root.after(1000, self.countdown)
+            self.after_id = self.root.after(1000, self.countdown)
 
     def run(self):
         self.root.mainloop()
 
+    @staticmethod
+    def replace_not_keyboard_symbols(text):
+        new_text = ""
+        for index in range(len(text)):
+            if text[index] in SystemConstants.REPLACEMENTS.keys():
+                new_text += SystemConstants.REPLACEMENTS[text[index]]
+            else:
+                new_text += text[index]
+        return new_text
 
-def add_music():
-    pygame.init()
-    music_dir = Path("Music")
-    tracks = [i for i in music_dir.iterdir()]
-    pygame.mixer.music.load(random.choice(tracks))
-    for music in tracks:
-        pygame.mixer.music.queue(music)
-    pygame.mixer.music.play()
+    @staticmethod
+    def add_music():
+        pygame.init()
+        music_dir = Path("Music")
+
+        tracks = [i for i in music_dir.iterdir()]
+        pygame.mixer.music.load(random.choice(tracks))
+
+        for music in tracks:
+            pygame.mixer.music.queue(music)
+
+        pygame.mixer.music.play()
 
 
 if __name__ == "__main__":
@@ -227,5 +317,5 @@ if __name__ == "__main__":
         from ctypes import windll
 
         windll.shcore.SetProcessDpiAwareness(1)
-    add_music()
+    Application.add_music()
     Application().run()
