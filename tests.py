@@ -97,4 +97,49 @@ class TestTextReplacement(unittest.TestCase):
 
         self.assertEqual(result, "")
 
+    def test_one_rome_number_text(self):
+        text = "Ⅴ"
+
+        result = FileVerifier.replace_not_keyboard_symbols(text)
+
+        self.assertEqual(result, "V")
+
+    def test_some_rome_numbers_text(self):
+        text = "ⅤⅬⅣⅢ"
+
+        result = FileVerifier.replace_not_keyboard_symbols(text)
+
+        self.assertEqual(result, "VLIVIII")
+
+    def test_one_rome_number_with_normal_symbols(self):
+        text = "simple Ⅲ"
+
+        result = FileVerifier.replace_not_keyboard_symbols(text)
+
+        self.assertEqual(result, "simple III")
+
+    def test_some_rome_numbers_with_normal_symbols(self):
+        text = "simple Ⅲ to me in ⅩⅣ"
+
+        result = FileVerifier.replace_not_keyboard_symbols(text)
+
+        self.assertEqual(result, "simple III to me in XIV")
+
+    def test_text_without_replacements(self):
+
+        text = "simple text without replacements"
+
+        result = FileVerifier.replace_not_keyboard_symbols(text)
+
+        self.assertEqual(result, text)
+
+    def test_dash_replacements(self):
+
+        text = "—–‒―"
+
+        result = FileVerifier.replace_not_keyboard_symbols(text)
+
+        self.assertEqual(result, "----")
+
+
 

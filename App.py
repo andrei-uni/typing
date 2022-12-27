@@ -160,7 +160,7 @@ class Application:
 
     def open_file(self, file: Path):
         with file.open(encoding="utf-8") as f:
-            text = f.read().strip()
+            text = FileVerifier.replace_not_keyboard_symbols(f.read().strip())
             repeats = re.findall(SystemConstants.REPEAT_REGEX, text)
             if len(text) < 100:
                 messagebox.showinfo("Текст недоступен", f"Вы выбрали текст, короче 100 символов ({len(text)})")
@@ -169,7 +169,7 @@ class Application:
                 messagebox.showinfo("Текст недоступен",
                                     f"В вашем тексте символ {repeats[0][0][0]} повторяется более 3 раз подряд")
                 return self.open_preset_file(CURRENT_SETTINGS.language)
-            return FileVerifier.replace_not_keyboard_symbols(text)
+            return text
 
     def on_music(self):
         pygame.mixer.music.unpause()
