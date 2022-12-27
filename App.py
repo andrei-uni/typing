@@ -28,6 +28,7 @@ CURRENT_SETTINGS = CurrentSettings()
 
 class Application:
     def __init__(self, custom_file=''):
+        self.text_len = None
         self.text = None
         self.root = Tk()
         self.setup_root()
@@ -70,7 +71,6 @@ class Application:
 
         self.select_text(custom_file)
 
-        self.text_len = len(self.text)
         self.setup_text_widget()
 
         self.root.focus_force()
@@ -137,6 +137,7 @@ class Application:
             self.add_highlight_for_symbol("wrong", self.cur_index, self.cur_index + 1)
 
         if self.cur_index == self.text_len:
+
             self.add_record()
 
         self.accuracy_stat.update_statistic()
@@ -161,13 +162,17 @@ class Application:
     def open_file(self, file: Path):
         with file.open(encoding="utf-8") as f:
             text = FileVerifier.replace_not_keyboard_symbols(f.read().strip())
+            self.text_len = len(text)
             repeats = re.findall(SystemConstants.REPEAT_REGEX, text)
             if len(text) < 100:
                 messagebox.showinfo("Текст недоступен", f"Вы выбрали текст, короче 100 символов ({len(text)})")
                 return self.open_preset_file(CURRENT_SETTINGS.language)
+            if FileVerifier.check_not_keyboard_symbols(text):
+                messagebox.showinfo("Текст недоступен", "В тексте есть неклавиатурные символы")
+                return self.open_preset_file(CURRENT_SETTINGS.language)
             if len(repeats) > 0:
                 messagebox.showinfo("Текст недоступен",
-                                    f"В вашем тексте символ {repeats[0][0][0]} повторяется более 3 раз подряд")
+                                    f"В вашем тексте символ {repeats[0][0][0]} повторяется более 4 раз подряд")
                 return self.open_preset_file(CURRENT_SETTINGS.language)
             return text
 

@@ -11,3 +11,10 @@ class FileVerifier:
             else:
                 new_text += text[index]
         return new_text
+
+    @staticmethod
+    def check_not_keyboard_symbols(text):
+        for index in range(len(text)):
+            if text[index] not in SystemConstants.KeyboardSymbols:
+                return True
+        return False

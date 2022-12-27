@@ -2,7 +2,7 @@ import re
 
 
 class SystemConstants:
-    REPEAT_REGEX = re.compile(r"((\w)\2{4,})")
+    REPEAT_REGEX = re.compile(r"((\w)\2{5,})")
     REPLACEMENTS = {"—": "-",
                     "–": "-",
                     "‒": "-",
@@ -24,3 +24,4 @@ class SystemConstants:
                     "Ⅾ": "D",
                     "Ⅿ": "M",
                     }
+    KeyboardSymbols = " ёЁ1!23№4;5%6:7?8*9(0)-_=+йЙцЦуУкКеЕнНгГшШщЩзЗхХъЪ\/фФыЫвВаАпПрРоОлЛдДжЖэЭяЯчЧсСмМиИтТьЬбБюЮ.,~`@#$%^&|qQwWeErRtTyYuUiIoOpP[{]}aAsSdDfFgGhHjJkKlL:'\"zZxXcCvVbBnNmM<>"
